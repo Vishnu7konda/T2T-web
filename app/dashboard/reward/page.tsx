@@ -1,9 +1,19 @@
 "use client";
+import { useState } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { Gift, Star } from "lucide-react";
+import confetti from "canvas-confetti";
+import { Gift, Star, History, CheckCircle2 } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 
 const rewards = [
   {
@@ -93,6 +103,47 @@ const nextRewardCredits = 200;
 const creditsToNext = nextRewardCredits - userCredits;
 
 export default function RewardPage() {
+  const [redeemedReward, setRedeemedReward] = useState<any>(null);
+  const [redemptionCode, setRedemptionCode] = useState<string>("");
+  const [isRedeemDialogOpen, setIsRedeemDialogOpen] = useState(false);
+  const [isCelebrating, setIsCelebrating] = useState(false);
+
+  const [history, setHistory] = useState<any[]>([
+    { id: 101, name: "Eco Bamboo Bottle", date: "2026-02-28", code: "ECOB-44D1-9F08" },
+    { id: 102, name: "Coffee Shop Voucher", date: "2026-02-15", code: "COFF-78A9-2B3C" },
+  ]);
+  const [isHistoryDialogOpen, setIsHistoryDialogOpen] = useState(false);
+
+  const handleRedeem = (reward: any) => {
+    // Generate a fake code
+    const baseCode = reward.name.substring(0, 4).toUpperCase().replace(/\s/g, 'X');
+    const code = `${baseCode}-${Math.random().toString(36).substring(2, 6).toUpperCase()}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
+
+    setRedeemedReward(reward);
+    setRedemptionCode(code);
+    setIsRedeemDialogOpen(true);
+    setIsCelebrating(true);
+
+    // Trigger confetti
+    confetti({
+      particleCount: 150,
+      spread: 70,
+      origin: { y: 0.6 },
+      colors: ['#10b981', '#fde047', '#0ea5e9']
+    });
+
+    // Wait for celebration animation before showing the code
+    setTimeout(() => {
+      setIsCelebrating(false);
+      setHistory(prev => [{
+        id: Date.now(),
+        name: reward.name,
+        date: new Date().toISOString().split('T')[0],
+        code
+      }, ...prev]);
+    }, 2800);
+  };
+
   return (
     <section className="w-full relative z-10 p-2">
       {/* Reward Header Banner */}
@@ -113,15 +164,15 @@ export default function RewardPage() {
             Redeem your credits for amazing, premium eco-friendly rewards and keep making a difference.
           </p>
           <div className="bg-white/20 backdrop-blur-md border border-white/30 rounded-xl p-4 w-full max-w-sm shadow-inner">
-            <div className="text-sm text-white font-semibold mb-2 drop-shadow-sm">
+            <div className="text-sm text-white font-bold mb-3 drop-shadow-sm">
               {`You're just ${creditsToNext} credits away from your next reward`}
             </div>
-            <div className="w-full bg-black/20 rounded-full h-3 relative overflow-hidden shadow-inner">
+            <div className="w-full bg-[#10b981] rounded-full h-3 relative overflow-hidden shadow-inner">
               <motion.div
                 initial={{ width: 0 }}
                 animate={{ width: `${(userCredits / nextRewardCredits) * 100}%` }}
                 transition={{ duration: 1.5, ease: "easeOut" }}
-                className="bg-gradient-to-r from-green-300 to-yellow-300 h-full rounded-full"
+                className="bg-gradient-to-r from-[#bbf7d0] to-[#fde047] h-full rounded-full"
               />
             </div>
           </div>
@@ -135,10 +186,10 @@ export default function RewardPage() {
         >
           <div className="relative w-48 h-48 md:w-56 md:h-56">
             <Image
-              src="/rewards/banner.png"
-              alt="Gifts with recycling icons"
+              src="/rewards/premium_box.png"
+              alt="Premium Eco Reward Box"
               fill
-              className="object-cover rounded-2xl shadow-xl shadow-black/20 border-2 border-white/40"
+              className="object-cover rounded-2xl shadow-xl shadow-black/20 border-2 border-white/20"
               priority
             />
           </div>
@@ -158,6 +209,14 @@ export default function RewardPage() {
             </span>
           </div>
         </div>
+        <Button
+          variant="outline"
+          className="border-emerald-600 text-emerald-700 hover:bg-emerald-50 font-bold bg-white"
+          onClick={() => setIsHistoryDialogOpen(true)}
+        >
+          <History className="w-5 h-5 mr-2" />
+          Reward History
+        </Button>
       </div>
       {/* Rewards Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -203,6 +262,7 @@ export default function RewardPage() {
                     {reward.creditsText}
                   </span>
                   <Button
+                    onClick={() => handleRedeem(reward)}
                     className="bg-gradient-eco text-white font-bold px-6 py-2 rounded-xl shadow-md hover:shadow-lg transition-all"
                   >
                     Redeem
@@ -213,6 +273,103 @@ export default function RewardPage() {
           </motion.div>
         ))}
       </div>
+
+      {/* Redeem Success Dialog */}
+      <Dialog open={isRedeemDialogOpen} onOpenChange={(open) => {
+        if (!open) { setIsRedeemDialogOpen(false); setIsCelebrating(false); }
+      }}>
+        <DialogContent className="sm:max-w-md text-center border-emerald-100 border-2 shadow-2xl overflow-hidden rounded-2xl">
+          <div className="absolute top-0 left-0 right-0 h-4 bg-gradient-eco" />
+
+          {isCelebrating ? (
+            <div className="py-12 flex flex-col items-center justify-center">
+              <DialogTitle className="sr-only">Unwrapping Reward</DialogTitle>
+              <motion.div
+                initial={{ scale: 0, rotate: -180 }}
+                animate={{ scale: 1, rotate: 0 }}
+                transition={{ type: "spring", stiffness: 260, damping: 20 }}
+                className="w-24 h-24 bg-gradient-to-br from-yellow-300 to-yellow-500 rounded-full flex items-center justify-center mb-6 shadow-xl border-4 border-white"
+              >
+                <Gift className="h-12 w-12 text-white" />
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+              >
+                <h3 className="text-2xl font-bold text-gray-900 mb-2">Unwrapping your reward...</h3>
+                <p className="text-gray-500">Making some eco-magic happen!</p>
+              </motion.div>
+            </div>
+          ) : (
+            <>
+              <DialogHeader className="pt-6">
+                <motion.div
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  className="mx-auto w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mb-6 shadow-md border-4 border-white"
+                >
+                  <CheckCircle2 className="h-12 w-12 text-emerald-600" />
+                </motion.div>
+                <DialogTitle className="text-3xl font-extrabold text-center text-gray-900">Congratulations!</DialogTitle>
+                <DialogDescription className="text-center text-lg mt-3 font-medium text-gray-600">
+                  You have successfully redeemed <strong className="text-emerald-700">{redeemedReward?.name}</strong>. Enjoy your reward and thank you for making a positive impact!
+                </DialogDescription>
+              </DialogHeader>
+              <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.2 }}
+                className="bg-gray-50 border border-gray-200 p-5 rounded-xl mt-6"
+              >
+                <p className="text-xs text-gray-500 mb-2 font-bold uppercase tracking-widest">Your Unique Redemption Code</p>
+                <p className="text-3xl font-mono font-bold text-gray-900 tracking-wider bg-white py-3 rounded-lg border border-gray-100 shadow-sm">{redemptionCode}</p>
+              </motion.div>
+              <DialogFooter className="mt-8 sm:justify-center">
+                <Button onClick={() => setIsRedeemDialogOpen(false)} className="bg-emerald-600 hover:bg-emerald-700 text-white w-full sm:w-auto px-10 text-lg font-bold h-12 rounded-xl">
+                  Got it, thanks!
+                </Button>
+              </DialogFooter>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* History Dialog */}
+      <Dialog open={isHistoryDialogOpen} onOpenChange={setIsHistoryDialogOpen}>
+        <DialogContent className="sm:max-w-xl max-h-[85vh] overflow-y-auto rounded-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold flex items-center gap-2 text-gray-900">
+              <History className="h-6 w-6 text-emerald-600" />
+              Reward History
+            </DialogTitle>
+            <DialogDescription className="text-gray-600 font-medium">
+              A record of all the rewards you have successfully claimed.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="mt-4 space-y-4 pb-4">
+            {history.length > 0 ? (
+              history.map((item) => (
+                <div key={item.id} className="bg-white border border-gray-100 shadow-sm p-4 rounded-xl flex flex-col sm:flex-row justify-between sm:items-center gap-4 hover:border-emerald-200 hover:shadow-md transition-all">
+                  <div>
+                    <h4 className="font-bold text-gray-900 text-lg">{item.name}</h4>
+                    <p className="text-sm text-gray-500 font-medium flex items-center gap-1">Claimed on {item.date}</p>
+                  </div>
+                  <div className="bg-emerald-50 px-4 py-2 rounded-lg border border-emerald-100 shrink-0">
+                    <span className="font-mono font-bold text-emerald-700">{item.code}</span>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="text-center py-12 text-gray-500">
+                <Gift className="h-12 w-12 mx-auto text-gray-300 mb-3" />
+                <p className="font-medium">You haven't claimed any rewards yet.</p>
+                <p className="text-sm">Keep earning credits!</p>
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </section>
   );
 }

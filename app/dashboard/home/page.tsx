@@ -28,19 +28,19 @@ export default function Homepage() {
             transition={{ duration: 6, repeat: Infinity }}
           />
           {/* Hero Text */}
-          <div className="flex-1 min-w-[250px] flex flex-col justify-center items-center md:items-start w-full">
-            <h1 className="font-extrabold text-foreground text-3xl sm:text-4xl md:text-5xl text-center md:text-left mb-4 sm:mb-6 leading-tight drop-shadow-sm z-10">
+          <div className="flex-1 min-w-[200px] max-w-full flex flex-col justify-center items-center md:items-start w-full">
+            <h1 className="font-extrabold text-foreground text-3xl sm:text-4xl md:text-5xl text-center md:text-left mb-4 sm:mb-6 leading-tight drop-shadow-sm z-10 w-full break-words">
               Turn{" "}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-500">
                 Trash
               </span>{" "}
               Into Treasure 🌍
             </h1>
-            <p className="text-gray-600 text-center md:text-left mb-6 sm:mb-8 max-w-lg text-base sm:text-lg leading-relaxed px-2 sm:px-0">
+            <p className="text-gray-600 text-center md:text-left mb-6 sm:mb-8 max-w-lg w-full text-base sm:text-lg leading-relaxed px-2 sm:px-0">
               Earn rewards for eco-friendly waste disposal. Upload proof, earn
               credits, and redeem them for cool prizes while saving the planet.
             </p>
-            <div className="flex flex-col sm:flex-row justify-center md:justify-start gap-4 w-full sm:w-auto z-10">
+            <div className="flex flex-col sm:flex-row justify-center md:justify-start gap-4 w-full z-10">
               <Link href="/dashboard" passHref className="w-full sm:w-auto">
                 <Button className="w-full sm:w-auto bg-gradient-eco text-white hover:opacity-90 font-semibold px-6 py-6 rounded-xl shadow-xl hover:shadow-2xl transition-all hover:scale-105 text-lg">
                   🚮 Upload Disposal

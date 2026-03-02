@@ -3,7 +3,8 @@
 import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Wallet as WalletIcon, TrendingUp, Download, Gift, ArrowUpRight, Recycle, RefreshCw } from "lucide-react";
+import Link from "next/link";
+import { Wallet as WalletIcon, TrendingUp, Download, Gift, ArrowUpRight, Recycle, RefreshCw, Trophy, BookOpen, ChevronRight } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { usePoints } from "../context/PointsContext";
 //import { useUser } from "@clerk/nextjs";
@@ -144,7 +145,7 @@ export default function WalletPage() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <Recycle className="h-8 w-8 animate-spin text-green-600" />
-        <span className="ml-2 text-gray-600">Loading wallet...</span>
+        <span className="ml-2 text-gray-600">Loading dashboard...</span>
       </div>
     );
   }
@@ -154,8 +155,8 @@ export default function WalletPage() {
       <div>
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Digital Wallet</h1>
-            <p className="text-gray-600 mt-1">Manage your points and redeem rewards</p>
+            <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
+            <p className="text-gray-600 mt-1">Manage your points, redeem rewards, and track impact.</p>
           </div>
           <Button
             variant="outline"
@@ -274,6 +275,45 @@ export default function WalletPage() {
         </CardContent>
       </Card>
 
+      {/* Explore Features Overlay (Migrated from Top Navigation) */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Leaderboard Card */}
+        <Link href="/dashboard/leaderboard" className="block">
+          <Card className="hover:shadow-lg transition-all border-l-4 border-l-yellow-400 group cursor-pointer bg-gradient-to-r from-white to-yellow-50">
+            <CardContent className="p-6 flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="h-12 w-12 bg-yellow-100 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <Trophy className="h-6 w-6 text-yellow-600" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900">Leaderboard</h3>
+                  <p className="text-sm text-gray-600">See top recyclers and your rank</p>
+                </div>
+              </div>
+              <ChevronRight className="h-5 w-5 text-gray-400 group-hover:text-yellow-600 group-hover:translate-x-1 transition-all" />
+            </CardContent>
+          </Card>
+        </Link>
+
+        {/* Learn Card */}
+        <Link href="/dashboard/learn" className="block">
+          <Card className="hover:shadow-lg transition-all border-l-4 border-l-blue-400 group cursor-pointer bg-gradient-to-r from-white to-blue-50">
+            <CardContent className="p-6 flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="h-12 w-12 bg-blue-100 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <BookOpen className="h-6 w-6 text-blue-600" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900">Learn</h3>
+                  <p className="text-sm text-gray-600">Discover tips to recycle better</p>
+                </div>
+              </div>
+              <ChevronRight className="h-5 w-5 text-gray-400 group-hover:text-blue-600 group-hover:translate-x-1 transition-all" />
+            </CardContent>
+          </Card>
+        </Link>
+      </div>
+
       {/* Transaction History */}
       <Card>
         <CardHeader>
@@ -294,14 +334,14 @@ export default function WalletPage() {
               {walletData.transactions.map((transaction) => (
                 <div
                   key={transaction.id}
-                  className="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-lg hover:shadow-md transition-shadow"
+                  className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-white border border-gray-200 rounded-lg hover:shadow-md transition-shadow gap-3 sm:gap-4 overflow-hidden"
                 >
-                  <div className="flex items-center gap-4">
-                    <div className={`h-10 w-10 rounded-full flex items-center justify-center ${getTransactionColor(transaction.type)}`}>
+                  <div className="flex items-center gap-4 w-full sm:w-auto overflow-hidden">
+                    <div className={`h-10 w-10 shrink-0 rounded-full flex items-center justify-center ${getTransactionColor(transaction.type)}`}>
                       <span className="text-xl">{getTransactionIcon(transaction.type)}</span>
                     </div>
-                    <div>
-                      <p className="font-medium text-gray-900">{transaction.description}</p>
+                    <div className="min-w-0 flex-1">
+                      <p className="font-medium text-gray-900 truncate">{transaction.description}</p>
                       <p className="text-sm text-gray-500">
                         {new Date(transaction.createdAt).toLocaleDateString('en-US', {
                           year: 'numeric',
@@ -313,7 +353,7 @@ export default function WalletPage() {
                       </p>
                     </div>
                   </div>
-                  <div className="text-right">
+                  <div className="text-left sm:text-right pl-14 sm:pl-0 shrink-0">
                     <p className={`text-lg font-bold ${transaction.type === 'REDEEMED' ? 'text-red-600' : 'text-green-600'
                       }`}>
                       {transaction.type === 'REDEEMED' ? '-' : '+'}{Math.abs(transaction.points)}

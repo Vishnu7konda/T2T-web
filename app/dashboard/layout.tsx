@@ -21,11 +21,9 @@ import { PointsProvider, usePoints } from "./context/PointsContext";
 
 const navigation = [
   { name: "Home", href: "/dashboard/home", icon: Home },
-  { name: "Scan Waste", href: "/dashboard/scan", icon: Camera },
-  { name: "Wallet", href: "/dashboard/wallet", icon: Wallet },
+  { name: "Scan Earn", href: "/dashboard/scan", icon: Camera },
+  { name: "Dashboard", href: "/dashboard/wallet", icon: Wallet },
   { name: "Reward", href: "/dashboard/reward", icon: Gift },
-  { name: "Leaderboard", href: "/dashboard/leaderboard", icon: Trophy },
-  { name: "Learn", href: "/dashboard/learn", icon: BookOpen },
   { name: "Profile", href: "/dashboard/profile", icon: User },
 ];
 
@@ -157,13 +155,13 @@ export default function DashboardLayout({
 }) {
   return (
     <PointsProvider>
-      <div className="min-h-screen bg-gradient-subtle flex flex-col">
+      <div className="min-h-screen bg-gradient-subtle flex flex-col w-full overflow-hidden">
         {/* Top Header */}
         <DashboardHeader />
 
         {/* Main content - Dynamic padding for mobile bottom nav */}
-        <main className="flex-1 pt-24 pb-24 md:pb-6 animate-fade-in relative z-0">
-          <div className="p-4 sm:p-6">{children}</div>
+        <main className="flex-1 pt-20 sm:pt-24 pb-24 md:pb-8 animate-fade-in relative z-0 w-full max-w-[1920px] mx-auto">
+          <div className="w-full px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16">{children}</div>
         </main>
 
         {/* Bottom Navigation (Mobile Only) */}

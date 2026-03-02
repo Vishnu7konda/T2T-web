@@ -213,12 +213,12 @@ export default function LeaderboardPage() {
                     : "bg-white border border-gray-200 hover:shadow-md"
                     }`}
                 >
-                  <div className="flex items-center gap-3 sm:gap-4 w-full sm:w-auto">
+                  <div className="flex items-center gap-3 sm:gap-4 w-full sm:w-auto overflow-hidden">
                     <div className="text-xl sm:text-2xl font-bold w-10 sm:w-12 text-center shrink-0">
                       {getRankIcon(user.rank)}
                     </div>
                     <div
-                      className={`h-12 w-12 rounded-full bg-gradient-to-br ${getLevelGradient(
+                      className={`h-12 w-12 shrink-0 rounded-full bg-gradient-to-br ${getLevelGradient(
                         user.level
                       )} flex items-center justify-center text-white font-bold shadow-md overflow-hidden`}
                     >
@@ -228,28 +228,28 @@ export default function LeaderboardPage() {
                         user.avatar
                       )}
                     </div>
-                    <div>
-                      <h3 className="font-bold text-gray-900">
+                    <div className="min-w-0 flex-1">
+                      <h3 className="font-bold text-gray-900 truncate">
                         {user.name}
                         {currentUser && user.id === currentUser.id && (
-                          <span className="ml-2 text-xs bg-green-500 text-white px-2 py-0.5 rounded-full">
+                          <span className="ml-2 text-xs bg-green-500 text-white px-2 py-0.5 rounded-full inline-block">
                             You
                           </span>
                         )}
                       </h3>
-                      <p className="text-sm text-gray-600">
+                      <p className="text-sm text-gray-600 truncate">
                         {user.level} Level
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center justify-between sm:justify-end gap-6 w-full sm:w-auto mt-2 sm:mt-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-gray-100">
+                  <div className="flex items-center justify-between sm:justify-end gap-6 w-full sm:w-auto mt-2 sm:mt-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-gray-100 shrink-0">
                     <div className="text-left sm:text-right">
                       <p className="text-xs sm:text-sm text-gray-600">Submissions</p>
                       <p className="font-bold text-gray-900">{user.submissions}</p>
                     </div>
                     <div className="text-right">
                       <p className="text-xs sm:text-sm text-gray-600">Points</p>
-                      <div className="flex items-center gap-1">
+                      <div className="flex items-center gap-1 justify-end">
                         <span className="text-lg sm:text-xl">🪙</span>
                         <p className="font-bold text-green-600 text-base sm:text-lg">{user.points.toLocaleString()}</p>
                       </div>

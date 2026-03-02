@@ -461,20 +461,20 @@ export default function UserDashboard() {
 
             <div className="space-y-6">
               {!imageDataUrl && !cameraActive && (
-                <div className="max-w-md mx-auto">
+                <div className="max-w-md w-full mx-auto">
                   <button
                     type="button"
                     onClick={startCamera}
                     suppressHydrationWarning
-                    className="group relative w-full h-48 rounded-2xl border-2 border-dashed border-green-400 bg-green-50/50 hover:bg-green-50 transition-all duration-300 overflow-hidden flex flex-col items-center justify-center gap-4 shadow-inner"
+                    className="group relative w-full h-48 rounded-2xl border-2 border-dashed border-green-400 bg-green-50/50 hover:bg-green-50 transition-all duration-300 overflow-hidden flex flex-col items-center justify-center gap-4 shadow-inner px-2"
                   >
                     {/* Hover Scanning Line Effect */}
                     <div className="absolute top-0 left-0 w-full h-1 bg-green-400 opacity-0 group-hover:opacity-100 group-hover:animate-[scan_2s_ease-in-out_infinite]" />
-                    <div className="h-16 w-16 bg-white rounded-full flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300">
+                    <div className="h-16 w-16 bg-white rounded-full flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300 shrink-0">
                       <Camera className="h-8 w-8 text-green-600" />
                     </div>
-                    <div>
-                      <span className="block text-lg font-bold text-green-800">Tap to Open Scanner</span>
+                    <div className="text-center">
+                      <span className="block text-lg font-bold text-green-800 truncate">Tap to Open Scanner</span>
                       <span className="text-sm text-green-600/80">Camera access required</span>
                     </div>
                   </button>
