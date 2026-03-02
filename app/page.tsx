@@ -24,6 +24,7 @@ import {
   CardContent,
   CardDescription,
 } from "@/components/ui/card";
+import Footer from "@/app/dashboard/footer/page";
 
 export default function Home() {
   const { isSignedIn } = useAuth();
@@ -201,7 +202,7 @@ export default function Home() {
                   <Button
                     size="lg"
                     variant="outline"
-                    className="border-2 border-white text-white hover:bg-white/10 hover:shadow-lg transition-all"
+                    className="bg-transparent border-2 border-white text-white hover:bg-white/10 hover:text-white hover:shadow-lg transition-all"
                   >
                     Learn More
                   </Button>
@@ -406,6 +407,9 @@ export default function Home() {
           </Card>
         </motion.div>
       </section>
+
+      {/* Global Footer */}
+      <Footer />
     </div>
   );
 }

@@ -41,7 +41,7 @@ export default function Homepage() {
               credits, and redeem them for cool prizes while saving the planet.
             </p>
             <div className="flex flex-col sm:flex-row justify-center md:justify-start gap-4 w-full z-10">
-              <Link href="/dashboard" passHref className="w-full sm:w-auto">
+              <Link href="/dashboard/scan" passHref className="w-full sm:w-auto">
                 <Button className="w-full sm:w-auto bg-gradient-eco text-white hover:opacity-90 font-semibold px-6 py-6 rounded-xl shadow-xl hover:shadow-2xl transition-all hover:scale-105 text-lg">
                   🚮 Upload Disposal
                 </Button>

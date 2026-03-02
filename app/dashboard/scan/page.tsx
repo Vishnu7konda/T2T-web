@@ -114,17 +114,20 @@ export default function UserDashboard() {
             }
             const data = await response.json();
             const address = data.address || {};
-            const locationName =
-              address.city ||
-              address.town ||
-              address.village ||
-              address.state ||
-              "Unknown Location";
-            const state = address.state || "Telangana";
-            setLocation(`${locationName}, ${state}`);
+            const detailedLocation = [
+              address.amenity || address.building,
+              address.road,
+              address.suburb || address.neighbourhood,
+              address.city || address.town || address.village,
+              address.state,
+              address.postcode
+            ].filter(Boolean).join(", ");
+
+            const finalLocation = detailedLocation || "Unknown Location";
+            setLocation(finalLocation);
             toast({
               title: "📍 Location Detected",
-              description: `${locationName}, ${state}`,
+              description: finalLocation,
             });
           } catch {
             setLocation(`Lat: ${latitude.toFixed(4)}, Lon: ${longitude.toFixed(4)}`);
