@@ -6,6 +6,8 @@ import confetti from "canvas-confetti";
 import { Gift, Star, History, CheckCircle2 } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/components/ui/use-toast";
+import { usePoints } from "../context/PointsContext";
 import {
   Dialog,
   DialogContent,
@@ -103,11 +105,17 @@ const rewards = [
   },
 ];
 
-const userCredits = 150;
-const nextRewardCredits = 200;
-const creditsToNext = nextRewardCredits - userCredits;
-
 export default function RewardPage() {
+  const { points: userCredits, setPoints } = usePoints();
+  const { toast } = useToast();
+
+  const getNextRewardCredits = (credits: number) => {
+    const upcoming = rewards.filter(r => r.points > credits).sort((a, b) => a.points - b.points);
+    return upcoming.length > 0 ? upcoming[0].points : credits + 100;
+  };
+  const nextRewardCredits = getNextRewardCredits(userCredits);
+  const creditsToNext = Math.max(0, nextRewardCredits - userCredits);
+
   const [redeemedReward, setRedeemedReward] = useState<any>(null);
   const [redemptionCode, setRedemptionCode] = useState<string>("");
   const [isRedeemDialogOpen, setIsRedeemDialogOpen] = useState(false);
@@ -120,6 +128,18 @@ export default function RewardPage() {
   const [isHistoryDialogOpen, setIsHistoryDialogOpen] = useState(false);
 
   const handleRedeem = (reward: any) => {
+    if (userCredits < reward.points) {
+      toast({
+        title: "Insufficient Credits",
+        description: `You need ${reward.points - userCredits} more credits to redeem ${reward.name}. Keep recycling!`,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Deduct points locally
+    setPoints(prev => prev - reward.points);
+
     // Generate a fake code
     const baseCode = reward.name.substring(0, 4).toUpperCase().replace(/\s/g, 'X');
     const code = `${baseCode}-${Math.random().toString(36).substring(2, 6).toUpperCase()}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;

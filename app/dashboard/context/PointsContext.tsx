@@ -5,6 +5,7 @@ import { useUser } from "@clerk/nextjs";
 
 interface PointsContextType {
   points: number;
+  setPoints: React.Dispatch<React.SetStateAction<number>>;
   pointsLoading: boolean;
   refreshPoints: () => Promise<void>;
 }
@@ -50,7 +51,7 @@ export function PointsProvider({ children }: { children: ReactNode }) {
   }, [refreshPoints]);
 
   return (
-    <PointsContext.Provider value={{ points, pointsLoading, refreshPoints }}>
+    <PointsContext.Provider value={{ points, setPoints, pointsLoading, refreshPoints }}>
       {children}
     </PointsContext.Provider>
   );

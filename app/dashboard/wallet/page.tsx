@@ -249,31 +249,7 @@ export default function WalletPage() {
         </Card>
       </div>
 
-      {/* Available Rewards */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Available Rewards</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {rewards.map((reward) => (
-              <div
-                key={reward.name}
-                className="bg-gradient-to-br from-green-50 to-blue-50 p-4 rounded-lg border border-gray-200 hover:shadow-lg transition-shadow"
-              >
-                <div className="text-4xl mb-3">{reward.icon}</div>
-                <h3 className="font-semibold text-gray-900 mb-2">{reward.name}</h3>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-bold text-green-600">{reward.points} pts</span>
-                  <Button size="sm" variant="outline">
-                    Redeem
-                  </Button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+
 
       {/* Explore Features Overlay (Migrated from Top Navigation) */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

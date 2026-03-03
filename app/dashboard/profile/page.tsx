@@ -364,61 +364,44 @@ export default function ProfilePage() {
         </CardContent>
       </Card>
 
-      {/* Personal Information */}
+      {/* Contact Us */}
       <Card className="bg-white/60 backdrop-blur-md border border-white/50 shadow-sm relative overflow-hidden hover:shadow-lg hover:scale-[1.02] transition-all duration-300">
         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-400 to-cyan-500" />
         <CardHeader>
-          <CardTitle>Personal Information</CardTitle>
+          <CardTitle>Contact Us</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label className="text-sm font-medium text-gray-700 mb-2 block">Full Name</label>
-              <Input
-                value={userData?.name || user?.fullName || ''}
-                disabled
-                className="bg-gray-50"
-              />
-              <p className="text-xs text-gray-500 mt-1">Edit in Clerk Dashboard</p>
+          <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); toast({ title: "Message Sent", description: "We've received your message and will get back to you soon." }); }}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">Your Name</label>
+                <Input placeholder="Enter your name" required />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">Email Address</label>
+                <Input type="email" placeholder="Enter your email" required />
+              </div>
             </div>
-            <div>
-              <label className="text-sm font-medium text-gray-700 mb-2 block">Email</label>
-              <Input
-                value={userData?.email || user?.primaryEmailAddress?.emailAddress || ''}
-                type="email"
-                disabled
-                className="bg-gray-50"
-              />
-              <p className="text-xs text-gray-500 mt-1">Edit in Clerk Dashboard</p>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-700">Subject</label>
+              <Input placeholder="What is this regarding?" required />
             </div>
-            <div>
-              <label className="text-sm font-medium text-gray-700 mb-2 block">User ID</label>
-              <Input
-                value={userData?.id || user?.id || ''}
-                disabled
-                className="bg-gray-50 font-mono text-xs"
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-700">Message</label>
+              <textarea
+                className="flex min-h-[120px] w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 disabled:cursor-not-allowed disabled:opacity-50 resize-y"
+                placeholder="Type your message here..."
+                required
               />
             </div>
-            <div>
-              <label className="text-sm font-medium text-gray-700 mb-2 block">Account Status</label>
-              <Input
-                value={userData?.status || 'ACTIVE'}
-                disabled
-                className="bg-white/50 border-white/60 text-green-700 font-bold"
-              />
-            </div>
-          </div>
-          <div className="mt-6 flex flex-col sm:flex-row justify-between items-center bg-blue-50/50 p-4 rounded-xl border border-blue-100/50 gap-4 text-center sm:text-left">
-            <p className="text-sm text-gray-600 font-medium">
-              💡 To update your name or email, visit your Clerk account settings
-            </p>
             <Button
-              className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white shadow-md hover:shadow-lg transition-all w-full sm:w-auto"
-              onClick={() => window.open('https://accounts.clerk.dev', '_blank')}
+              type="submit"
+              className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white shadow-md hover:shadow-lg transition-all"
             >
-              Open Clerk Dashboard
+              <Mail className="h-4 w-4 mr-2" />
+              Send Message
             </Button>
-          </div>
+          </form>
         </CardContent>
       </Card>
 
