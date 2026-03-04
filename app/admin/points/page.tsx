@@ -9,23 +9,23 @@ const pointsStats = [
   {
     title: "Total Points Awarded",
     value: "126,100",
+    subtitle: "+2,450 this month",
     icon: Coins,
-    color: "text-yellow-600",
-    bg: "bg-yellow-50",
+    color: "from-purple-500 to-purple-700",
   },
   {
     title: "Avg Points/Submission",
-    value: "42",
+    value: "42.5",
+    subtitle: "+1.2 from last month",
     icon: TrendingUp,
-    color: "text-green-600",
-    bg: "bg-green-50",
+    color: "from-green-500 to-green-700",
   },
   {
     title: "Top Earner",
     value: "4,870",
+    subtitle: "Priya Sharma",
     icon: Award,
-    color: "text-purple-600",
-    bg: "bg-purple-50",
+    color: "from-blue-500 to-blue-700",
   },
 ];
 
@@ -105,20 +105,24 @@ export default function PointsHistoryPage() {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         {pointsStats.map((stat, index) => {
-          // Moved logic inside a function block, as .map parameter must be an expression or function
           const Icon = stat.icon;
           return (
-            <Card key={index} className="hover:shadow-lg transition-shadow">
+            <Card key={index} className="relative overflow-hidden hover:-translate-y-1 hover:shadow-xl transition-all duration-300 border-gray-200">
+              <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r opacity-90 transition-opacity ${stat.color}`}></div>
               <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">{stat.title}</p>
-                    <p className="text-2xl font-bold text-gray-900 mt-2">{stat.value}</p>
+                <div className="flex items-center justify-between mb-4">
+                  <p className="text-sm font-semibold text-gray-500">{stat.title}</p>
+                  <div className={`w-10 h-10 rounded-xl text-white flex items-center justify-center shadow-sm bg-gradient-to-br ${stat.color}`}>
+                    <Icon className="h-5 w-5" />
                   </div>
-                  <div className={`p-3 rounded-full ${stat.bg}`}>
-                    <Icon className={`h-6 w-6 ${stat.color}`} />
+                </div>
+                <div>
+                  <h4 className="text-3xl font-bold text-gray-900">{stat.value}</h4>
+                  <div className={`flex items-center gap-1 mt-2 text-sm font-medium ${stat.title === "Top Earner" ? "text-blue-600" : "text-green-600"}`}>
+                    <TrendingUp className="h-4 w-4" />
+                    {stat.subtitle}
                   </div>
                 </div>
               </CardContent>
@@ -128,23 +132,23 @@ export default function PointsHistoryPage() {
       </div>
 
       {/* Transaction History */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Calendar className="h-5 w-5" />
+      <Card className="overflow-hidden border-gray-200 shadow-sm">
+        <CardHeader className="bg-gray-50/50 border-b pb-4">
+          <CardTitle className="flex items-center gap-2 text-lg">
+            <Calendar className="h-5 w-5 text-gray-500" />
             Recent Transactions
           </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-0">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-gray-200">
-                  <th className="text-left py-3 px-4 font-semibold text-gray-700">Transaction ID</th>
-                  <th className="text-left py-3 px-4 font-semibold text-gray-700">User</th>
-                  <th className="text-left py-3 px-4 font-semibold text-gray-700">Waste Type</th>
-                  <th className="text-left py-3 px-4 font-semibold text-gray-700">Points</th>
-                  <th className="text-left py-3 px-4 font-semibold text-gray-700">Date & Time</th>
+                <tr className="border-b border-gray-200 bg-gray-50/20">
+                  <th className="text-left py-4 px-6 font-semibold text-gray-600 text-sm">Transaction ID</th>
+                  <th className="text-left py-4 px-6 font-semibold text-gray-600 text-sm">User</th>
+                  <th className="text-left py-4 px-6 font-semibold text-gray-600 text-sm">Waste Type</th>
+                  <th className="text-left py-4 px-6 font-semibold text-gray-600 text-sm">Points</th>
+                  <th className="text-left py-4 px-6 font-semibold text-gray-600 text-sm">Date & Time</th>
                 </tr>
               </thead>
               <tbody>
@@ -153,29 +157,29 @@ export default function PointsHistoryPage() {
                     key={transaction.id}
                     className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
                   >
-                    <td className="py-4 px-4">
-                      <code className="text-sm bg-gray-100 px-2 py-1 rounded font-mono text-gray-700">
+                    <td className="py-4 px-6">
+                      <code className="text-sm bg-gray-100 px-2.5 py-1.5 rounded-md font-mono text-gray-700">
                         {transaction.submissionId}
                       </code>
                     </td>
-                    <td className="py-4 px-4">
+                    <td className="py-4 px-6">
                       <div className="flex items-center gap-3">
-                        <div className="h-8 w-8 rounded-full bg-gradient-to-br from-green-400 to-blue-400 flex items-center justify-center text-white font-semibold text-sm">
+                        <div className="h-8 w-8 rounded-full bg-gradient-to-br from-green-400 to-blue-400 flex items-center justify-center text-white font-semibold text-sm shadow-sm">
                           {transaction.user.charAt(0)}
                         </div>
                         <span className="font-medium text-gray-900">{transaction.user}</span>
                       </div>
                     </td>
-                    <td className="py-4 px-4 text-gray-600">{transaction.wasteType}</td>
-                    <td className="py-4 px-4">
+                    <td className="py-4 px-6 text-gray-600 font-medium">{transaction.wasteType}</td>
+                    <td className="py-4 px-6">
                       <div className="flex items-center gap-2">
-                        <span className="text-2xl">🪙</span>
+                        <span className="text-amber-500 font-medium">🪙</span>
                         <span className="text-lg font-bold text-green-600">
                           +{transaction.points}
                         </span>
                       </div>
                     </td>
-                    <td className="py-4 px-4 text-gray-600">{transaction.date}</td>
+                    <td className="py-4 px-6 text-gray-500 text-sm">{transaction.date}</td>
                   </tr>
                 ))}
               </tbody>

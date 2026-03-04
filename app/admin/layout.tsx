@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { Menu, X, Leaf, BarChart3, Images, Users, TrendingUp, Coins, Settings, Circle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { UserButton, useUser } from "@clerk/nextjs";
+import { UserButton, useUser, RedirectToSignIn } from "@clerk/nextjs";
 
 // Move the navigation out, badge will be set below with dynamic value
 const navigationBase = [
@@ -21,8 +21,28 @@ const navigationBase = [
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname();
-  const { user } = useUser();
+  const { isLoaded, isSignedIn, user } = useUser();
   const [pendingCount, setPendingCount] = useState<number | null>(null);
+
+  // Check auth
+  if (isLoaded && !isSignedIn) {
+    return <RedirectToSignIn />;
+  }
+
+  const allowedEmails = ["veeramanenisaicharan@gmail.com", "vishnu.konda40@gmail.com"];
+  const userEmail = user?.primaryEmailAddress?.emailAddress;
+
+  if (isLoaded && isSignedIn && (!userEmail || !allowedEmails.includes(userEmail))) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-slate-50">
+        <h1 className="text-3xl font-bold text-red-600 mb-4">Access Denied</h1>
+        <p className="text-gray-600 mb-8">You do not have permission to access the admin portal.</p>
+        <Link href="/">
+          <Button className="bg-green-600 hover:bg-green-700">Return to Home</Button>
+        </Link>
+      </div>
+    );
+  }
 
   // Fetch pending submissions count
   useEffect(() => {

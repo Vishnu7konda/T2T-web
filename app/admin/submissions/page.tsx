@@ -5,7 +5,7 @@ import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { CheckCircle2, XCircle, UserCircle, MapPin, Calendar, Filter, Recycle, Eye, Download } from "lucide-react";
+import { CheckCircle2, XCircle, UserCircle, MapPin, Calendar, Filter, Recycle, Eye, Download, Coins } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 
 interface Submission {
@@ -33,6 +33,7 @@ export default function SubmissionsPage() {
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [loading, setLoading] = useState(true);
   const [viewingImage, setViewingImage] = useState<string | null>(null);
+  const [pointsInput, setPointsInput] = useState<Record<string, number>>({});
   const { toast } = useToast();
 
   const fetchSubmissions = useCallback(async () => {
@@ -126,10 +127,11 @@ export default function SubmissionsPage() {
 
   const handleVerify = async (id: string, userName: string) => {
     try {
+      const customPoints = pointsInput[id] || 50;
       const response = await fetch(`/api/submissions/${id}/verify`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: 'VERIFIED', points: 50 }),
+        body: JSON.stringify({ status: 'VERIFIED', points: customPoints }),
       });
 
       if (!response.ok) {
@@ -204,32 +206,59 @@ export default function SubmissionsPage() {
       </div>
 
       {/* Filters */}
-      <Card>
+      <Card className="mb-8">
         <CardContent className="p-6">
-          <div className="flex flex-wrap gap-4 items-center">
-            <div className="flex items-center gap-2">
-              <Filter className="h-5 w-5 text-gray-500" />
-              <span className="font-medium text-gray-700">Filters:</span>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-gray-900">Filter Submissions</h3>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-medium text-gray-700">Status</label>
+              <select
+                className="p-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-green-600 focus:ring-1 focus:ring-green-600"
+                value={filter}
+                onChange={(e) => setFilter(e.target.value)}
+              >
+                <option value="ALL">All Status</option>
+                <option value="PENDING">Pending</option>
+                <option value="VERIFIED">Verified</option>
+                <option value="REJECTED">Rejected</option>
+              </select>
             </div>
-            <div className="flex gap-2">
-              {["ALL", "PENDING", "VERIFIED", "REJECTED"].map((status) => (
-                <Button
-                  key={status}
-                  variant={filter === status ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setFilter(status)}
-                >
-                  {status}
-                </Button>
-              ))}
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-medium text-gray-700">Date Range</label>
+              <select className="p-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-green-600 focus:ring-1 focus:ring-green-600">
+                <option value="all">All Time</option>
+                <option value="today">Today</option>
+                <option value="week">This Week</option>
+                <option value="month">This Month</option>
+              </select>
             </div>
-            <Input
-              type="text"
-              placeholder="Search by user, location, or waste type..."
-              className="max-w-md ml-auto"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-medium text-gray-700">Location</label>
+              <select className="p-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-green-600 focus:ring-1 focus:ring-green-600">
+                <option value="all">All Locations</option>
+                <option value="hyderabad">Hyderabad</option>
+                <option value="warangal">Warangal</option>
+                <option value="nizamabad">Nizamabad</option>
+                <option value="karimnagar">Karimnagar</option>
+                <option value="khammam">Khammam</option>
+              </select>
+            </div>
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-medium text-gray-700">User Search</label>
+              <Input
+                type="text"
+                placeholder="Search by user name..."
+                className="rounded-lg shadow-sm"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+          </div>
+          <div className="flex gap-3 mt-6 justify-end">
+            <Button className="bg-green-600 hover:bg-green-700 text-white shadow-sm">Apply Filters</Button>
+            <Button variant="secondary" onClick={() => { setFilter("ALL"); setSearchTerm(""); }}>Clear</Button>
           </div>
         </CardContent>
       </Card>
@@ -272,9 +301,12 @@ export default function SubmissionsPage() {
           {filteredSubmissions.map((submission) => (
             <Card
               key={submission.id}
-              className="overflow-hidden hover:shadow-xl transition-all duration-300 group"
+              className={`overflow-hidden hover:shadow-xl transition-all duration-300 group ${submission.status === 'VERIFIED' ? 'border-green-500 bg-gradient-to-br from-green-50/50 to-green-100/50' :
+                  submission.status === 'REJECTED' ? 'border-red-500 bg-gradient-to-br from-red-50/50 to-red-100/50' :
+                    'border-yellow-500 bg-gradient-to-br from-yellow-50/50 to-yellow-100/50'
+                }`}
             >
-              <div className="relative h-48 bg-gray-200 overflow-hidden group/image">
+              <div className="relative h-48 bg-gray-200 overflow-hidden group/image rounded-t-xl">
                 <Image
                   src={submission.imageUrl}
                   alt={submission.wasteType}
@@ -302,10 +334,10 @@ export default function SubmissionsPage() {
                 <div className="absolute top-2 right-2">
                   <span
                     className={`px-3 py-1 rounded-full text-xs font-semibold ${submission.status === "VERIFIED"
-                        ? "bg-green-500 text-white"
-                        : submission.status === "PENDING"
-                          ? "bg-yellow-500 text-white"
-                          : "bg-red-500 text-white"
+                      ? "bg-green-500 text-white"
+                      : submission.status === "PENDING"
+                        ? "bg-yellow-500 text-white"
+                        : "bg-red-500 text-white"
                       }`}
                   >
                     {submission.status}
@@ -352,24 +384,49 @@ export default function SubmissionsPage() {
                 </div>
 
                 {submission.status === "PENDING" && (
-                  <div className="flex gap-2 pt-2">
-                    <Button
-                      className="flex-1 bg-green-600 hover:bg-green-700"
-                      size="sm"
-                      onClick={() => handleVerify(submission.id, submission.user?.name || 'User')}
-                    >
-                      <CheckCircle2 className="h-4 w-4 mr-1" />
-                      Verify
-                    </Button>
-                    <Button
-                      variant="destructive"
-                      className="flex-1"
-                      size="sm"
-                      onClick={() => handleReject(submission.id, submission.user?.name || 'User')}
-                    >
-                      <XCircle className="h-4 w-4 mr-1" />
-                      Reject
-                    </Button>
+                  <div className="pt-2 space-y-3">
+                    <div className="flex gap-2 items-center">
+                      <Input
+                        type="number"
+                        placeholder="Enter points"
+                        min={0}
+                        max={100}
+                        className="flex-1 bg-white"
+                        value={pointsInput[submission.id] !== undefined ? pointsInput[submission.id] : 25}
+                        onChange={(e) => setPointsInput({ ...pointsInput, [submission.id]: parseInt(e.target.value) || 0 })}
+                      />
+                      <Button
+                        className="bg-purple-600 hover:bg-purple-700 text-white"
+                        onClick={() => {
+                          toast({
+                            title: "✅ Points Assigned",
+                            description: `${pointsInput[submission.id] || 25} points will be assigned upon verification.`
+                          });
+                        }}
+                      >
+                        <Coins className="h-4 w-4 mr-1" />
+                        Assign
+                      </Button>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        className="flex-1 bg-green-500 hover:bg-green-600 text-white"
+                        size="sm"
+                        onClick={() => handleVerify(submission.id, submission.user?.name || 'User')}
+                      >
+                        <CheckCircle2 className="h-4 w-4 mr-1" />
+                        Verify
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        className="flex-1 bg-red-500 hover:bg-red-600 text-white"
+                        size="sm"
+                        onClick={() => handleReject(submission.id, submission.user?.name || 'User')}
+                      >
+                        <XCircle className="h-4 w-4 mr-1" />
+                        Reject
+                      </Button>
+                    </div>
                   </div>
                 )}
               </CardContent>

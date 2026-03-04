@@ -170,16 +170,21 @@ export default function UsersPage() {
         {userStatsConfig.map((stat) => {
           const Icon = stat.icon;
           return (
-            <Card key={stat.title} className="hover:shadow-lg transition-shadow">
+            <Card key={stat.title} className="relative overflow-hidden hover:-translate-y-1 hover:shadow-xl transition-all duration-300 border-gray-200">
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-green-600 to-blue-600"></div>
               <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">{stat.title}</p>
-                    <p className="text-2xl font-bold text-gray-900 mt-2">{stat.value.toLocaleString()}</p>
+                <div className="flex items-center justify-between mb-4">
+                  <p className="text-sm font-semibold text-gray-500">{stat.title}</p>
+                  <div className={`w-10 h-10 rounded-xl text-white flex items-center justify-center shadow-sm ${stat.title === "Total Users" ? "bg-gradient-to-br from-blue-500 to-blue-700" :
+                      stat.title === "Active Users" ? "bg-gradient-to-br from-green-500 to-green-700" :
+                        stat.title === "New This Week" ? "bg-gradient-to-br from-yellow-400 to-orange-500" :
+                          "bg-gradient-to-br from-purple-500 to-purple-700"
+                    }`}>
+                    <Icon className="h-5 w-5" />
                   </div>
-                  <div className={`p-3 rounded-full ${stat.bg}`}>
-                    <Icon className={`h-6 w-6 ${stat.color}`} />
-                  </div>
+                </div>
+                <div>
+                  <h4 className="text-3xl font-bold text-gray-900">{stat.value.toLocaleString()}</h4>
                 </div>
               </CardContent>
             </Card>
@@ -245,15 +250,19 @@ export default function UsersPage() {
                       </td>
                       <td className="py-4 px-4 text-gray-600">{user.email}</td>
                       <td className="py-4 px-4">
-                        <span className={`px-3 py-1 rounded-full text-xs font-semibold ${user.role === 'ADMIN'
-                            ? 'bg-red-100 text-red-700'
-                            : 'bg-blue-100 text-blue-700'
+                        <span className={`px-3 py-1 rounded-md text-xs font-semibold ${user.role === 'ADMIN'
+                          ? 'bg-red-100 text-red-700'
+                          : 'bg-blue-100 text-blue-700'
                           }`}>
                           {user.role}
                         </span>
                       </td>
                       <td className="py-4 px-4">
-                        <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getLevelColor(user.level)}`}>
+                        <span className={`px-2.5 py-1 rounded-md text-xs font-semibold uppercase tracking-wider ${user.level === 'PLATINUM' ? 'bg-indigo-100 text-indigo-800' :
+                            user.level === 'GOLD' ? 'bg-yellow-100 text-yellow-800' :
+                              user.level === 'SILVER' ? 'bg-gray-100 text-gray-700' :
+                                'bg-amber-100 text-amber-900' // BRONZE
+                          }`}>
                           {user.level}
                         </span>
                       </td>
@@ -270,9 +279,9 @@ export default function UsersPage() {
                       </td>
                       <td className="py-4 px-4">
                         <span
-                          className={`px-3 py-1 rounded-full text-xs font-semibold ${user.status === "ACTIVE"
-                              ? "bg-green-100 text-green-700"
-                              : "bg-gray-100 text-gray-700"
+                          className={`px-2.5 py-1 rounded-md text-xs font-semibold ${user.status === "ACTIVE"
+                            ? "bg-green-100 text-green-700"
+                            : "bg-gray-100 text-gray-600"
                             }`}
                         >
                           {user.status}
