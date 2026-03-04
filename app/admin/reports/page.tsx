@@ -45,8 +45,46 @@ export default function ReportsPage() {
         throw new Error('Failed to fetch reports');
       }
       const data = await response.json();
-      setRegionalStats(data.regionalStats || []);
-      setProgressData(data.progressData || { weekly: [], monthly: [], yearly: [] });
+
+      let rStats = data.regionalStats || [];
+      let pData = data.progressData || { weekly: [], monthly: [], yearly: [] };
+
+      // Showcase data if empty
+      if (rStats.length === 0) {
+        rStats = [
+          { region: "Hyderabad", submissions: 1247, points: 48920, users: 543, color: "from-blue-500 to-blue-600" },
+          { region: "Warangal", submissions: 892, points: 34560, users: 387, color: "from-green-500 to-green-600" },
+          { region: "Nizamabad", submissions: 645, points: 25880, users: 241, color: "from-purple-500 to-purple-600" },
+          { region: "Others", submissions: 423, points: 16740, users: 163, color: "from-orange-500 to-orange-600" },
+        ];
+      }
+
+      if (pData.weekly.length === 0) {
+        pData = {
+          weekly: [
+            { period: 'Week 1', submissions: 45, verified: 38, rejected: 7, points: 950 },
+            { period: 'Week 2', submissions: 52, verified: 44, rejected: 8, points: 1100 },
+            { period: 'Week 3', submissions: 48, verified: 41, rejected: 7, points: 1025 },
+            { period: 'Week 4', submissions: 58, verified: 49, rejected: 9, points: 1225 }
+          ],
+          monthly: [
+            { period: 'Jan', submissions: 203, verified: 172, rejected: 31, points: 4300 },
+            { period: 'Feb', submissions: 189, verified: 161, rejected: 28, points: 4025 },
+            { period: 'Mar', submissions: 234, verified: 198, rejected: 36, points: 4950 },
+            { period: 'Apr', submissions: 267, verified: 225, rejected: 42, points: 5625 },
+            { period: 'May', submissions: 245, verified: 208, rejected: 37, points: 5200 },
+            { period: 'Jun', submissions: 289, verified: 244, rejected: 45, points: 6100 }
+          ],
+          yearly: [
+            { period: '2022', submissions: 1850, verified: 1572, rejected: 278, points: 39300 },
+            { period: '2023', submissions: 2340, verified: 1989, rejected: 351, points: 49725 },
+            { period: '2024', submissions: 2890, verified: 2456, rejected: 434, points: 61400 }
+          ]
+        };
+      }
+
+      setRegionalStats(rStats);
+      setProgressData(pData);
     } catch (error) {
       console.error(error);
       toast({

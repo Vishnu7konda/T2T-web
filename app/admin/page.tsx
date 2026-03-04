@@ -59,14 +59,71 @@ export default function AdminDashboard() {
       const res = await fetch('/api/admin/dashboard');
       if (res.ok) {
         const data = await res.json();
-        setDashboardData(data);
+        let newStats = data.stats || {
+          pendingSubmissions: 0,
+          verifiedToday: 0,
+          rejectedToday: 0,
+          totalPoints: 0,
+          totalUsers: 0,
+          newThisWeek: 0
+        };
+        let newSubmissions = data.recentSubmissions || [];
+
+        // Showcase mock data if empty
+        if (newStats.totalUsers === 0 && newSubmissions.length === 0) {
+          newStats = {
+            pendingSubmissions: 12,
+            verifiedToday: 45,
+            rejectedToday: 3,
+            totalPoints: 12500,
+            totalUsers: 128,
+            newThisWeek: 15
+          };
+          newSubmissions = [
+            {
+              id: 1,
+              userId: 'USR001',
+              user: { name: 'Priya Sharma', email: 'priya@example.com' },
+              imageUrl: 'https://images.pexels.com/photos/3735218/pexels-photo-3735218.jpeg',
+              wasteType: 'Plastic Bottles',
+              location: 'Hyderabad, Telangana',
+              createdAt: new Date().toISOString(),
+              status: 'PENDING',
+              pointsAwarded: 0,
+            },
+            {
+              id: 2,
+              userId: 'USR002',
+              user: { name: 'Rajesh Kumar', email: 'rajesh@example.com' },
+              imageUrl: 'https://images.pexels.com/photos/802221/pexels-photo-802221.jpeg',
+              wasteType: 'Aluminum Cans',
+              location: 'Warangal, Telangana',
+              createdAt: new Date(Date.now() - 3600000).toISOString(),
+              status: 'VERIFIED',
+              pointsAwarded: 35,
+            },
+            {
+              id: 3,
+              userId: 'USR003',
+              user: { name: 'Anita Reddy', email: 'anita@example.com' },
+              imageUrl: 'https://images.pexels.com/photos/3735218/pexels-photo-3735218.jpeg',
+              wasteType: 'Paper Waste',
+              location: 'Karimnagar, Telangana',
+              createdAt: new Date(Date.now() - 7200000).toISOString(),
+              status: 'REJECTED',
+              pointsAwarded: 0,
+            }
+          ];
+        }
+
+        setDashboardData({ stats: newStats, recentSubmissions: newSubmissions });
 
         // Populate feed with recent events derived from submissions
-        if (data.recentSubmissions) {
-          const derivedActivities: Activity[] = data.recentSubmissions.map((sub: any) => {
+        if (newSubmissions.length > 0) {
+          const derivedActivities: Activity[] = newSubmissions.map((sub: any) => {
             let actionStr = 'submitted new waste item';
             let statusEnum: "new" | "verified" | "rejected" = 'new';
-            if (sub.status === 'VERIFIED') { actionStr = `earned ${sub.pointsAwarded} points`; statusEnum = 'verified'; }
+            if (sub.status === 'VERIFIED') { actionStr = `earned ${sub.pointsAwarded || 35} points`; statusEnum = 'verified'; }
             if (sub.status === 'REJECTED') { actionStr = 'submission rejected'; statusEnum = 'rejected'; }
 
             return {
