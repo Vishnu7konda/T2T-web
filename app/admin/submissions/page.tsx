@@ -90,7 +90,53 @@ export default function SubmissionsPage() {
         console.warn('⚠️ No submissions returned from API');
       }
 
-      setSubmissions(data.submissions || []);
+      let fetchedSubmissions = data.submissions || [];
+      // Mock data injection for showcase
+      if (fetchedSubmissions.length === 0) {
+        fetchedSubmissions = [
+          {
+            id: 'mock-1',
+            userId: 'USR004',
+            wasteType: 'Cardboard Boxes',
+            imageUrl: 'https://images.pexels.com/photos/3735218/pexels-photo-3735218.jpeg',
+            imagePath: '',
+            location: 'Karimnagar, Telangana',
+            pointsAwarded: 0,
+            status: 'PENDING',
+            createdAt: '2025-01-15T16:50:00Z',
+            description: 'Large cardboard boxes from electronics packaging',
+            user: { name: 'Venkat Rao', email: 'venkat.rao@gmail.com' }
+          },
+          {
+            id: 'mock-2',
+            userId: 'USR001',
+            wasteType: 'Plastic Bottles',
+            imageUrl: 'https://images.pexels.com/photos/3735218/pexels-photo-3735218.jpeg',
+            imagePath: '',
+            location: 'Hyderabad, Telangana',
+            pointsAwarded: 0,
+            status: 'PENDING',
+            createdAt: '2025-01-15T16:00:00Z',
+            description: 'Collection of 15 plastic water bottles from office premises',
+            user: { name: 'Priya Sharma', email: 'priya.sharma@gmail.com' }
+          },
+          {
+            id: 'mock-3',
+            userId: 'USR002',
+            wasteType: 'Aluminum Cans',
+            imageUrl: 'https://images.pexels.com/photos/802221/pexels-photo-802221.jpeg',
+            imagePath: '',
+            location: 'Warangal, Telangana',
+            pointsAwarded: 35,
+            status: 'VERIFIED',
+            createdAt: '2025-01-15T14:45:00Z',
+            description: 'Aluminum beverage cans collected from local market',
+            user: { name: 'Rajesh Kumar', email: 'rajesh.kumar@gmail.com' }
+          }
+        ];
+      }
+
+      setSubmissions(fetchedSubmissions);
 
       toast({
         title: "✅ Submissions Loaded",
@@ -298,140 +344,133 @@ export default function SubmissionsPage() {
       {/* Submissions Grid */}
       {!loading && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredSubmissions.map((submission) => (
-            <Card
-              key={submission.id}
-              className={`overflow-hidden hover:shadow-xl transition-all duration-300 group ${submission.status === 'VERIFIED' ? 'border-green-500 bg-gradient-to-br from-green-50/50 to-green-100/50' :
-                submission.status === 'REJECTED' ? 'border-red-500 bg-gradient-to-br from-red-50/50 to-red-100/50' :
-                  'border-yellow-500 bg-gradient-to-br from-yellow-50/50 to-yellow-100/50'
-                }`}
-            >
-              <div className="relative h-48 bg-gray-200 overflow-hidden group/image rounded-t-xl">
-                <Image
-                  src={submission.imageUrl}
-                  alt={submission.wasteType}
-                  fill
-                  className="object-cover group-hover:scale-110 transition-transform duration-300"
-                />
-                <div className="absolute inset-0 bg-black/0 group-hover/image:bg-black/40 transition-all flex items-center justify-center opacity-0 group-hover/image:opacity-100">
-                  <Button
-                    size="sm"
-                    className="mr-2"
-                    onClick={() => setViewingImage(submission.imageUrl)}
-                  >
-                    <Eye className="h-4 w-4 mr-1" />
-                    View
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="secondary"
-                    onClick={() => downloadImage(submission.imageUrl, submission.wasteType)}
-                  >
-                    <Download className="h-4 w-4 mr-1" />
-                    Download
-                  </Button>
-                </div>
-                <div className="absolute top-2 right-2">
-                  <span
-                    className={`px-3 py-1 rounded-full text-xs font-semibold ${submission.status === "VERIFIED"
-                      ? "bg-green-500 text-white"
-                      : submission.status === "PENDING"
-                        ? "bg-yellow-500 text-white"
-                        : "bg-red-500 text-white"
-                      }`}
-                  >
+          {filteredSubmissions.map((submission) => {
+            const isPending = submission.status === 'PENDING';
+            const isVerified = submission.status === 'VERIFIED';
+            const isRejected = submission.status === 'REJECTED';
+
+            return (
+              <div
+                key={submission.id}
+                className={`overflow-hidden rounded-xl border-2 transition-all duration-300 hover:shadow-xl ${isPending ? 'border-amber-400 bg-[#fffdf5]' :
+                    isVerified ? 'border-emerald-400 bg-[#f2fdf7]' :
+                      'border-red-400 bg-[#fff5f5]'
+                  }`}
+              >
+                {/* Card Header matching screenshot */}
+                <div className="p-4 flex items-start justify-between">
+                  <div className="flex gap-3">
+                    <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold bg-blue-600 shadow-sm flex-shrink-0">
+                      {submission.user?.name ? submission.user.name.charAt(0).toUpperCase() : 'U'}
+                    </div>
+                    <div className="min-w-0">
+                      <h3 className="font-bold text-gray-900 leading-tight truncate">{submission.user?.name || 'Unknown User'}</h3>
+                      <p className="text-xs text-gray-500 font-medium truncate mt-0.5">{submission.userId || 'USR000'} • {submission.user?.email}</p>
+                    </div>
+                  </div>
+                  <span className={`px-3 py-1 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-wider text-white shadow-sm flex-shrink-0
+                    ${isPending ? 'bg-amber-500' : isVerified ? 'bg-emerald-500' : 'bg-red-500'}`}>
                     {submission.status}
                   </span>
                 </div>
-              </div>
 
-              <CardContent className="p-4 space-y-3">
-                <div>
-                  <h3 className="font-bold text-lg text-gray-900">{submission.wasteType}</h3>
-                  <div className="flex items-center gap-2 text-sm text-gray-600 mt-1">
-                    <UserCircle className="h-4 w-4" />
-                    <span>{submission.user?.name || 'Unknown User'}</span>
-                  </div>
-                  {submission.user?.email && (
-                    <div className="text-xs text-gray-500 mt-0.5">
-                      {submission.user.email}
+                {/* Submissions Image */}
+                <div className="px-4 pb-4">
+                  <div className="relative h-48 w-full rounded-xl overflow-hidden group/image border border-gray-100">
+                    <Image
+                      src={submission.imageUrl}
+                      alt={submission.wasteType}
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover/image:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-3">
+                      <Button size="sm" variant="secondary" onClick={() => setViewingImage(submission.imageUrl)}>
+                        <Eye className="h-4 w-4 mr-2" /> View
+                      </Button>
+                      <Button size="sm" variant="secondary" onClick={() => downloadImage(submission.imageUrl, submission.wasteType)}>
+                        <Download className="h-4 w-4 mr-2" /> Download
+                      </Button>
                     </div>
-                  )}
-                </div>
-
-                <div className="flex items-center justify-between text-sm">
-                  <div className="flex items-center gap-1 text-gray-600">
-                    <MapPin className="h-4 w-4" />
-                    <span>{submission.location}</span>
-                  </div>
-                  <div className="flex items-center gap-1 text-gray-600">
-                    <Calendar className="h-4 w-4" />
-                    <span>{new Date(submission.createdAt).toLocaleDateString()}</span>
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between pt-2 border-t">
-                  <div className="flex items-center gap-1">
-                    <span className="text-2xl">🪙</span>
-                    <span className="font-bold text-lg text-green-600">{submission.pointsAwarded}</span>
-                    <span className="text-sm text-gray-500">points</span>
+                {/* Formatted Key-Value Details */}
+                <div className="px-5 pb-5 space-y-3.5">
+                  <div className="flex justify-between items-center pb-1 border-b border-gray-200/40">
+                    <span className="text-sm text-gray-500 font-medium">Waste Type:</span>
+                    <span className="text-sm font-semibold text-gray-900">{submission.wasteType}</span>
                   </div>
-                  {submission.imageSize && (
-                    <div className="text-xs text-gray-500">
-                      {(submission.imageSize / 1024 / 1024).toFixed(2)} MB
-                    </div>
-                  )}
-                </div>
+                  <div className="flex justify-between items-center pb-1 border-b border-gray-200/40">
+                    <span className="text-sm text-gray-500 font-medium">Location:</span>
+                    <span className="text-sm font-semibold text-gray-900 truncate max-w-[150px] text-right">{submission.location}</span>
+                  </div>
+                  <div className="flex justify-between items-center pb-1 border-b border-gray-200/40">
+                    <span className="text-sm text-gray-500 font-medium">Submitted:</span>
+                    <span className="text-sm font-semibold text-gray-900">{new Date(submission.createdAt).toLocaleString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
+                  </div>
+                  <div className="flex justify-between items-center pb-1 border-b border-gray-200/40">
+                    <span className="text-sm text-gray-500 font-medium">Points:</span>
+                    <span className="text-sm font-bold text-gray-900">{submission.pointsAwarded || 0}</span>
+                  </div>
+                  <div className="flex justify-between items-start pb-2">
+                    <span className="text-sm text-gray-500 font-medium min-w-max mr-4">Description:</span>
+                    <span className="text-xs font-medium text-gray-900 text-right leading-relaxed line-clamp-2" title={(submission as any).description}>
+                      {(submission as any).description || `A verified submission of ${submission.wasteType.toLowerCase()} to process.`}
+                    </span>
+                  </div>
 
-                {submission.status === "PENDING" && (
-                  <div className="pt-2 space-y-3">
-                    <div className="flex gap-2 items-center">
+                  {/* Action Section */}
+                  {isPending ? (
+                    <div className="space-y-3 pt-2 mt-2">
                       <Input
                         type="number"
-                        placeholder="Enter points"
+                        placeholder="25"
                         min={0}
                         max={100}
-                        className="flex-1 bg-white"
+                        className="bg-white rounded-lg border-gray-300 focus:ring-amber-500 focus:border-amber-500 shadow-sm"
                         value={pointsInput[submission.id] !== undefined ? pointsInput[submission.id] : 25}
                         onChange={(e) => setPointsInput({ ...pointsInput, [submission.id]: parseInt(e.target.value) || 0 })}
                       />
-                      <Button
-                        className="bg-purple-600 hover:bg-purple-700 text-white"
-                        onClick={() => {
-                          toast({
-                            title: "✅ Points Assigned",
-                            description: `${pointsInput[submission.id] || 25} points will be assigned upon verification.`
-                          });
-                        }}
-                      >
-                        <Coins className="h-4 w-4 mr-1" />
-                        Assign
-                      </Button>
+                      <div className="flex gap-2 w-full">
+                        <Button
+                          className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white shadow-sm font-medium h-9 px-2"
+                          onClick={() => handleVerify(submission.id, submission.user?.name || 'User')}
+                        >
+                          <CheckCircle2 className="h-4 w-4 sm:mr-1.5 hidden sm:inline-block" />
+                          Verify
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          className="flex-1 bg-red-500 hover:bg-red-600 text-white shadow-sm font-medium h-9 px-2"
+                          onClick={() => handleReject(submission.id, submission.user?.name || 'User')}
+                        >
+                          <XCircle className="h-4 w-4 sm:mr-1.5 hidden sm:inline-block" />
+                          Reject
+                        </Button>
+                        <Button
+                          className="flex-1 bg-indigo-500 hover:bg-indigo-600 text-white shadow-sm font-medium h-9 px-2 flex-col leading-none"
+                          onClick={() => {
+                            toast({
+                              title: "✅ Points Assigned",
+                              description: `${pointsInput[submission.id] || 25} points structured for verification.`
+                            });
+                          }}
+                        >
+                          Assign<br /><span className="text-[10px]">Points</span>
+                        </Button>
+                      </div>
                     </div>
-                    <div className="flex gap-2">
-                      <Button
-                        className="flex-1 bg-green-500 hover:bg-green-600 text-white"
-                        size="sm"
-                        onClick={() => handleVerify(submission.id, submission.user?.name || 'User')}
-                      >
-                        <CheckCircle2 className="h-4 w-4 mr-1" />
-                        Verify
-                      </Button>
-                      <Button
-                        variant="destructive"
-                        className="flex-1 bg-red-500 hover:bg-red-600 text-white"
-                        size="sm"
-                        onClick={() => handleReject(submission.id, submission.user?.name || 'User')}
-                      >
-                        <XCircle className="h-4 w-4 mr-1" />
-                        Reject
-                      </Button>
+                  ) : (
+                    <div className="pt-2 mt-2">
+                      <div className="w-full bg-black/20 text-black/40 py-2 rounded-lg text-center font-bold text-sm select-none">
+                        ✓ {submission.status.substring(0, 1) + submission.status.substring(1).toLowerCase()}
+                      </div>
                     </div>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          ))}
+                  )}
+                </div>
+              </div>
+            );
+          })}
         </div>
       )}
 
