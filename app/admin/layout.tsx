@@ -81,7 +81,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 h-16 bg-gradient-to-r from-green-600 to-blue-600 text-white shadow-lg z-50">
         <div className="flex items-center justify-between h-full px-4">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4">
             <Button
               variant="ghost"
               size="icon"
@@ -91,29 +91,29 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               {sidebarOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </Button>
             <div className="flex items-center gap-2">
-              <Leaf className="h-8 w-8" />
-              <div className="hidden md:block">
-                <h1 className="font-bold text-lg leading-tight">T2T Admin Dashboard</h1>
-                <p className="text-xs text-white/80">Trash2Treasure Telangana</p>
+              <Leaf className="h-6 w-6 sm:h-8 sm:w-8" />
+              <div className="hidden sm:block md:block">
+                <h1 className="font-bold text-base sm:text-lg leading-tight">T2T Admin Dashboard</h1>
+                <p className="text-[10px] sm:text-xs text-white/80">Trash2Treasure Telangana</p>
               </div>
             </div>
           </div>
 
-          <div className="flex items-center gap-4">
-            <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-white/20 rounded-full">
+          <div className="flex items-center gap-2 sm:gap-4">
+            <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 bg-white/20 rounded-full">
               <Circle className="h-2 w-2 fill-green-300 text-green-300 animate-pulse" />
               <span className="text-sm">Live Updates</span>
             </div>
-            <div className="flex items-center gap-3">
-              <div className="hidden md:block text-right">
-                <div className="font-semibold text-sm">{user?.fullName || user?.firstName || "Admin User"}</div>
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="hidden sm:block text-right">
+                <div className="font-semibold text-sm line-clamp-1 max-w-[120px] md:max-w-none">{user?.fullName || user?.firstName || "Admin User"}</div>
                 <div className="text-xs text-white/80">System Administrator</div>
               </div>
               <UserButton
                 afterSignOutUrl="/"
                 appearance={{
                   elements: {
-                    avatarBox: "h-10 w-10"
+                    avatarBox: "h-8 w-8 sm:h-10 sm:w-10"
                   }
                 }}
               />
@@ -201,7 +201,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
       {/* Main content */}
       <main className="lg:ml-64 pt-16 min-h-screen">
-        <div className="p-6">
+        <div className="p-4 sm:p-6 lg:p-8">
           {children}
         </div>
       </main>

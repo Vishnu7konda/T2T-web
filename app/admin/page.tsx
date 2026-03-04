@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Clock, Check, X, Coins, Users as UsersIcon, RefreshCw, Broadcast, ArrowUp, ArrowDown } from "lucide-react";
+import { Clock, Check, X, Coins, Users as UsersIcon, RefreshCw, ArrowUp, ArrowDown } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface Stat {
   title: string;
@@ -35,97 +36,99 @@ interface Submission {
   userId: string;
 }
 
-const mockActivities: Activity[] = [
-  { id: 1, user: 'Priya Sharma', action: 'submitted new waste item', details: 'Plastic bottles from Hyderabad', time: '2 minutes ago', status: 'new' },
-  { id: 2, user: 'Rajesh Kumar', action: 'earned 35 points', details: 'Aluminum cans verified', time: '5 minutes ago', status: 'verified' },
-  { id: 3, user: 'Anitha Reddy', action: 'submission rejected', details: 'Glass bottles - quality issues', time: '8 minutes ago', status: 'rejected' },
-  { id: 4, user: 'Venkat Rao', action: 'submitted new waste item', details: 'Cardboard boxes from Karimnagar', time: '12 minutes ago', status: 'new' },
-  { id: 5, user: 'Lakshmi Devi', action: 'earned 20 points', details: 'Paper waste verified', time: '15 minutes ago', status: 'verified' }
-];
-
-const mockSubmissions: Submission[] = [
-  {
-    id: 1,
-    userId: 'USR001',
-    userName: 'Priya Sharma',
-    userEmail: 'priya.sharma@gmail.com',
-    image: 'https://images.pexels.com/photos/3735218/pexels-photo-3735218.jpeg?auto=compress&cs=tinysrgb&w=400',
-    wasteType: 'Plastic Bottles',
-    location: 'Hyderabad, Telangana',
-    submissionDate: '1/15/2025 04:00 PM',
-    status: 'pending',
-    points: 0,
-    description: 'Collection of 15 plastic water bottles from office premises'
-  },
-  {
-    id: 4,
-    userId: 'USR004',
-    userName: 'Venkat Rao',
-    userEmail: 'venkat.rao@gmail.com',
-    image: 'https://images.pexels.com/photos/3735218/pexels-photo-3735218.jpeg?auto=compress&cs=tinysrgb&w=400',
-    wasteType: 'Cardboard Boxes',
-    location: 'Karimnagar, Telangana',
-    submissionDate: '1/15/2025 04:50 PM',
-    status: 'pending',
-    points: 0,
-    description: 'Large cardboard boxes from electronics packaging'
-  },
-  {
-    id: 2,
-    userId: 'USR002',
-    userName: 'Rajesh Kumar',
-    userEmail: 'rajesh.kumar@gmail.com',
-    image: 'https://images.pexels.com/photos/802221/pexels-photo-802221.jpeg?auto=compress&cs=tinysrgb&w=400',
-    wasteType: 'Aluminum Cans',
-    location: 'Warangal, Telangana',
-    submissionDate: '1/15/2025 02:45 PM',
-    status: 'verified',
-    points: 35,
-    description: 'Aluminum beverage cans collected from local market'
-  }
-];
-
 export default function AdminDashboard() {
-  const [loading, setLoading] = useState(false);
-  const [activities, setActivities] = useState<Activity[]>(mockActivities);
+  const [loading, setLoading] = useState(true);
+  const [dashboardData, setDashboardData] = useState<{ stats: any, recentSubmissions: Submission[] }>({
+    stats: {
+      pendingSubmissions: 0,
+      verifiedToday: 0,
+      rejectedToday: 0,
+      totalPoints: 0,
+      totalUsers: 0,
+      newThisWeek: 0
+    },
+    recentSubmissions: []
+  });
+
+  // Convert API submissions to our Activity UI format for feed
+  const [activities, setActivities] = useState<Activity[]>([]);
+
+  const fetchDashboardData = useCallback(async () => {
+    try {
+      setLoading(true);
+      const res = await fetch('/api/admin/dashboard');
+      if (res.ok) {
+        const data = await res.json();
+        setDashboardData(data);
+
+        // Populate feed with recent events derived from submissions
+        if (data.recentSubmissions) {
+          const derivedActivities: Activity[] = data.recentSubmissions.map((sub: any) => {
+            let actionStr = 'submitted new waste item';
+            let statusEnum: "new" | "verified" | "rejected" = 'new';
+            if (sub.status === 'VERIFIED') { actionStr = `earned ${sub.pointsAwarded} points`; statusEnum = 'verified'; }
+            if (sub.status === 'REJECTED') { actionStr = 'submission rejected'; statusEnum = 'rejected'; }
+
+            return {
+              id: sub.id,
+              user: sub.user?.name || 'Unknown User',
+              action: actionStr,
+              details: sub.wasteType + " from " + sub.location,
+              time: new Date(sub.createdAt).toLocaleDateString(),
+              status: statusEnum
+            };
+          });
+          setActivities(derivedActivities);
+        }
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchDashboardData();
+  }, [fetchDashboardData]);
 
   const stats: Stat[] = [
     {
       title: "Pending Submissions",
-      value: "5",
-      change: "+5 from yesterday",
+      value: String(dashboardData.stats.pendingSubmissions),
+      change: "Live",
       changeType: "positive",
       icon: Clock,
       gradient: "from-amber-400 to-amber-600",
     },
     {
       title: "Verified Today",
-      value: "0",
-      change: "+4 from yesterday",
+      value: String(dashboardData.stats.verifiedToday),
+      change: "Live",
       changeType: "positive",
       icon: Check,
       gradient: "from-emerald-500 to-emerald-700",
     },
     {
       title: "Rejected Today",
-      value: "0",
-      change: "-1 from yesterday",
+      value: String(dashboardData.stats.rejectedToday),
+      change: "Live",
       changeType: "negative",
       icon: X,
       gradient: "from-red-500 to-red-700",
     },
     {
       title: "Points Awarded",
-      value: "98",
-      change: "+320 from yesterday",
+      value: String(dashboardData.stats.totalPoints.toLocaleString()),
+      change: "Total",
       changeType: "positive",
       icon: Coins,
       gradient: "from-violet-500 to-violet-700",
     },
     {
       title: "Active Users",
-      value: "5",
-      change: "+23 this week",
+      value: String(dashboardData.stats.totalUsers),
+      change: `+${dashboardData.stats.newThisWeek} this week`,
       changeType: "positive",
       icon: UsersIcon,
       gradient: "from-blue-500 to-blue-700",
@@ -133,14 +136,7 @@ export default function AdminDashboard() {
   ];
 
   const refreshData = () => {
-    setLoading(true);
-    setTimeout(() => {
-      setActivities([
-        { id: Date.now(), user: 'Venkat Rao', action: 'submitted new waste item', details: 'Activity from Karimnagar', time: 'Just now', status: 'new' },
-        ...mockActivities
-      ]);
-      setLoading(false);
-    }, 1000);
+    fetchDashboardData();
   };
 
   return (
@@ -176,15 +172,15 @@ export default function AdminDashboard() {
 
       {/* Real-time Feed */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-        <div className="p-6 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
+        <div className="p-4 sm:p-6 border-b border-gray-100 flex flex-col sm:flex-row items-center justify-between bg-gray-50/50 gap-4">
           <div className="flex items-center gap-3">
             <RadioIcon className="w-6 h-6 text-slate-700" />
-            <h2 className="text-xl font-bold text-slate-800">Real-time Activity Feed</h2>
+            <h2 className="text-lg sm:text-xl font-bold text-slate-800">Real-time Activity Feed</h2>
           </div>
-          <div className="flex items-center gap-2 text-sm text-gray-500 font-medium bg-white px-3 py-1.5 rounded-full border border-gray-200">
+          <Button variant="outline" size="sm" onClick={refreshData} className="flex items-center gap-2 text-sm text-gray-500 font-medium bg-white px-3 py-1.5 rounded-full border border-gray-200">
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin text-emerald-600' : ''}`} />
-            Auto-refresh: ON
-          </div>
+            Refresh Data
+          </Button>
         </div>
         <div className="max-h-[400px] overflow-y-auto">
           {activities.map((activity) => (
@@ -221,33 +217,30 @@ export default function AdminDashboard() {
             View All
           </button>
         </div>
-        <div className="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {mockSubmissions.map((sub, i) => (
+        <div className="p-4 sm:p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {dashboardData.recentSubmissions.map((sub: any, i) => (
             <div key={i} className={`bg-white rounded-xl border p-5 relative transition-all duration-300 hover:-translate-y-1 hover:shadow-xl
-              ${sub.status === 'pending' ? 'border-amber-400 bg-gradient-to-br from-amber-50 to-white' :
-                sub.status === 'verified' ? 'border-emerald-400 bg-gradient-to-br from-emerald-50 to-white' :
+              ${sub.status === 'PENDING' ? 'border-amber-400 bg-gradient-to-br from-amber-50 to-white' :
+                sub.status === 'VERIFIED' ? 'border-emerald-400 bg-gradient-to-br from-emerald-50 to-white' :
                   'border-red-400 bg-gradient-to-br from-red-50 to-white'}`}>
 
               <div className={`absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider text-white shadow-sm z-10
-                ${sub.status === 'pending' ? 'bg-amber-500' : sub.status === 'verified' ? 'bg-emerald-500' : 'bg-red-500'}`}>
+                ${sub.status === 'PENDING' ? 'bg-amber-500' : sub.status === 'VERIFIED' ? 'bg-emerald-500' : 'bg-red-500'}`}>
                 {sub.status}
               </div>
 
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 text-white flex items-center justify-center font-bold text-lg shadow-sm">
-                  {sub.userName.charAt(0)}
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 text-white flex items-center justify-center font-bold text-lg shadow-sm font-sans uppercase">
+                  {(sub.user?.name || 'U').charAt(0)}
                 </div>
-                <div>
-                  <h4 className="font-bold text-gray-900 leading-tight">{sub.userName}</h4>
-                  <p className="text-xs text-gray-500">{sub.userId} • {sub.userEmail}</p>
+                <div className="min-w-0">
+                  <h4 className="font-bold text-gray-900 leading-tight truncate">{sub.user?.name || 'Unknown User'}</h4>
+                  <p className="text-xs text-gray-500 truncate">{sub.userId.substring(0, 8)}... • {sub.user?.email}</p>
                 </div>
               </div>
 
               <div className="w-full h-48 bg-gray-100 rounded-lg mb-4 overflow-hidden relative group cursor-pointer">
-                <img src={sub.image} alt={sub.wasteType} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                  <span className="text-white font-medium bg-black/50 px-3 py-1.5 rounded-lg backdrop-blur-sm">View Image</span>
-                </div>
+                <img src={sub.imageUrl || 'https://images.pexels.com/photos/3735218/pexels-photo-3735218.jpeg?auto=compress&cs=tinysrgb&w=400'} alt={sub.wasteType} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
               </div>
 
               <div className="space-y-3 mb-4">
@@ -257,21 +250,17 @@ export default function AdminDashboard() {
                 </div>
                 <div className="flex justify-between items-center py-1 border-b border-gray-200/50">
                   <span className="text-sm text-gray-500 font-medium">Location:</span>
-                  <span className="text-sm font-semibold text-gray-900">{sub.location}</span>
+                  <span className="text-sm font-semibold text-gray-900 truncate max-w-[150px] text-right">{sub.location}</span>
                 </div>
                 <div className="flex justify-between items-center py-1 border-b border-gray-200/50">
                   <span className="text-sm text-gray-500 font-medium">Submitted:</span>
-                  <span className="text-sm font-semibold text-gray-900">{sub.submissionDate}</span>
+                  <span className="text-sm font-semibold text-gray-900">{new Date(sub.createdAt).toLocaleDateString()}</span>
                 </div>
                 <div className="flex justify-between items-center py-1 border-b border-gray-200/50">
                   <span className="text-sm text-gray-500 font-medium">Points:</span>
-                  <span className="text-sm font-bold text-gray-900">{sub.points}</span>
+                  <span className="text-sm font-bold text-gray-900">{sub.pointsAwarded || 0}</span>
                 </div>
               </div>
-
-              <p className="text-sm text-gray-600 line-clamp-2 mt-4">
-                <span className="font-medium text-gray-500">Description:</span> {sub.description}
-              </p>
             </div>
           ))}
         </div>

@@ -166,7 +166,7 @@ export default function UsersPage() {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {userStatsConfig.map((stat) => {
           const Icon = stat.icon;
           return (
@@ -176,9 +176,9 @@ export default function UsersPage() {
                 <div className="flex items-center justify-between mb-4">
                   <p className="text-sm font-semibold text-gray-500">{stat.title}</p>
                   <div className={`w-10 h-10 rounded-xl text-white flex items-center justify-center shadow-sm ${stat.title === "Total Users" ? "bg-gradient-to-br from-blue-500 to-blue-700" :
-                      stat.title === "Active Users" ? "bg-gradient-to-br from-green-500 to-green-700" :
-                        stat.title === "New This Week" ? "bg-gradient-to-br from-yellow-400 to-orange-500" :
-                          "bg-gradient-to-br from-purple-500 to-purple-700"
+                    stat.title === "Active Users" ? "bg-gradient-to-br from-green-500 to-green-700" :
+                      stat.title === "New This Week" ? "bg-gradient-to-br from-yellow-400 to-orange-500" :
+                        "bg-gradient-to-br from-purple-500 to-purple-700"
                     }`}>
                     <Icon className="h-5 w-5" />
                   </div>
@@ -195,7 +195,7 @@ export default function UsersPage() {
       {/* Search Bar */}
       <Card>
         <CardContent className="p-4">
-          <div className="relative">
+          <div className="relative w-full">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
             <Input
               type="text"
@@ -226,15 +226,15 @@ export default function UsersPage() {
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-gray-200">
-                    <th className="text-left py-3 px-4 font-semibold text-gray-700">Name</th>
-                    <th className="text-left py-3 px-4 font-semibold text-gray-700">Email</th>
-                    <th className="text-left py-3 px-4 font-semibold text-gray-700">Role</th>
-                    <th className="text-left py-3 px-4 font-semibold text-gray-700">Level</th>
-                    <th className="text-left py-3 px-4 font-semibold text-gray-700">Points</th>
-                    <th className="text-left py-3 px-4 font-semibold text-gray-700">Submissions</th>
-                    <th className="text-left py-3 px-4 font-semibold text-gray-700">Status</th>
-                    <th className="text-left py-3 px-4 font-semibold text-gray-700">Joined</th>
+                  <tr className="border-b border-gray-200 bg-gray-50/50">
+                    <th className="text-left py-3 px-4 font-semibold text-gray-700 whitespace-nowrap">Name</th>
+                    <th className="text-left py-3 px-4 font-semibold text-gray-700 whitespace-nowrap">Email</th>
+                    <th className="text-left py-3 px-4 font-semibold text-gray-700 whitespace-nowrap">Role</th>
+                    <th className="text-left py-3 px-4 font-semibold text-gray-700 whitespace-nowrap">Level</th>
+                    <th className="text-left py-3 px-4 font-semibold text-gray-700 whitespace-nowrap">Points</th>
+                    <th className="text-left py-3 px-4 font-semibold text-gray-700 whitespace-nowrap">Submissions</th>
+                    <th className="text-left py-3 px-4 font-semibold text-gray-700 whitespace-nowrap">Status</th>
+                    <th className="text-left py-3 px-4 font-semibold text-gray-700 whitespace-nowrap">Joined</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -245,10 +245,10 @@ export default function UsersPage() {
                           <div className="h-10 w-10 rounded-full bg-gradient-to-br from-green-400 to-blue-400 flex items-center justify-center text-white font-semibold">
                             {getInitials(user.name)}
                           </div>
-                          <span className="font-medium text-gray-900">{user.name}</span>
+                          <span className="font-medium text-gray-900 whitespace-nowrap">{user.name}</span>
                         </div>
                       </td>
-                      <td className="py-4 px-4 text-gray-600">{user.email}</td>
+                      <td className="py-4 px-4 text-gray-600 whitespace-nowrap">{user.email}</td>
                       <td className="py-4 px-4">
                         <span className={`px-3 py-1 rounded-md text-xs font-semibold ${user.role === 'ADMIN'
                           ? 'bg-red-100 text-red-700'
@@ -259,9 +259,9 @@ export default function UsersPage() {
                       </td>
                       <td className="py-4 px-4">
                         <span className={`px-2.5 py-1 rounded-md text-xs font-semibold uppercase tracking-wider ${user.level === 'PLATINUM' ? 'bg-indigo-100 text-indigo-800' :
-                            user.level === 'GOLD' ? 'bg-yellow-100 text-yellow-800' :
-                              user.level === 'SILVER' ? 'bg-gray-100 text-gray-700' :
-                                'bg-amber-100 text-amber-900' // BRONZE
+                          user.level === 'GOLD' ? 'bg-yellow-100 text-yellow-800' :
+                            user.level === 'SILVER' ? 'bg-gray-100 text-gray-700' :
+                              'bg-amber-100 text-amber-900' // BRONZE
                           }`}>
                           {user.level}
                         </span>
@@ -272,7 +272,7 @@ export default function UsersPage() {
                       <td className="py-4 px-4">
                         <div className="text-sm">
                           <div className="font-semibold text-gray-900">{user.totalSubmissions}</div>
-                          <div className="text-xs text-gray-500">
+                          <div className="text-xs text-gray-500 whitespace-nowrap">
                             ✅ {user.verifiedSubmissions} • ⏳ {user.pendingSubmissions} • ❌ {user.rejectedSubmissions}
                           </div>
                         </div>

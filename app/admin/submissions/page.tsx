@@ -211,7 +211,7 @@ export default function SubmissionsPage() {
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-gray-900">Filter Submissions</h3>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="flex flex-col gap-2">
               <label className="text-sm font-medium text-gray-700">Status</label>
               <select
@@ -256,9 +256,9 @@ export default function SubmissionsPage() {
               />
             </div>
           </div>
-          <div className="flex gap-3 mt-6 justify-end">
-            <Button className="bg-green-600 hover:bg-green-700 text-white shadow-sm">Apply Filters</Button>
-            <Button variant="secondary" onClick={() => { setFilter("ALL"); setSearchTerm(""); }}>Clear</Button>
+          <div className="flex flex-col sm:flex-row gap-3 mt-6 justify-end">
+            <Button className="bg-green-600 hover:bg-green-700 text-white shadow-sm w-full sm:w-auto">Apply Filters</Button>
+            <Button variant="secondary" onClick={() => { setFilter("ALL"); setSearchTerm(""); }} className="w-full sm:w-auto">Clear</Button>
           </div>
         </CardContent>
       </Card>
@@ -302,8 +302,8 @@ export default function SubmissionsPage() {
             <Card
               key={submission.id}
               className={`overflow-hidden hover:shadow-xl transition-all duration-300 group ${submission.status === 'VERIFIED' ? 'border-green-500 bg-gradient-to-br from-green-50/50 to-green-100/50' :
-                  submission.status === 'REJECTED' ? 'border-red-500 bg-gradient-to-br from-red-50/50 to-red-100/50' :
-                    'border-yellow-500 bg-gradient-to-br from-yellow-50/50 to-yellow-100/50'
+                submission.status === 'REJECTED' ? 'border-red-500 bg-gradient-to-br from-red-50/50 to-red-100/50' :
+                  'border-yellow-500 bg-gradient-to-br from-yellow-50/50 to-yellow-100/50'
                 }`}
             >
               <div className="relative h-48 bg-gray-200 overflow-hidden group/image rounded-t-xl">
