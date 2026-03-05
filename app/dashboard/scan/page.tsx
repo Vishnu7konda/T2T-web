@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Upload, Trophy, TrendingUp, Calendar, Award, Flame, Recycle, X, Camera, MapPin } from "lucide-react";
+import { Upload, Trophy, TrendingUp, Calendar, Award, Flame, Recycle, X, Camera, MapPin, ChevronDown } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { usePoints } from "../context/PointsContext";
 import { useUser } from "@clerk/nextjs";
@@ -89,6 +89,7 @@ export default function UserDashboard() {
   // Form state
   const [imageDataUrl, setImageDataUrl] = useState<string | null>(null);
   const [wasteType, setWasteType] = useState<string>("");
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const [location, setLocation] = useState<string>("");
   const [locationLoading, setLocationLoading] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -565,22 +566,54 @@ export default function UserDashboard() {
               )}
               {/* Form Fields */}
               <div className="max-w-md mx-auto space-y-4 sm:space-y-5 bg-white/40 p-4 sm:p-6 rounded-2xl border border-white/60 shadow-sm backdrop-blur-sm mt-6 sm:mt-8">
-                <div className="space-y-2">
+                <div className="space-y-2 relative">
                   <Label htmlFor="wasteType" className="text-gray-700 font-semibold ml-1">Waste Type</Label>
-                  <select
-                    id="wasteType"
-                    value={wasteType}
-                    onChange={(e) => setWasteType(e.target.value)}
-                    suppressHydrationWarning
-                    className="w-full p-3 bg-white/70 border border-white shadow-sm rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 transition-shadow text-gray-800"
-                  >
-                    <option value="">Select waste type...</option>
-                    {wasteTypes.map((type) => (
-                      <option key={type} value={type}>
-                        {type}
-                      </option>
-                    ))}
-                  </select>
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={() => setDropdownOpen(!dropdownOpen)}
+                      className="w-full p-4 bg-white/80 border border-white shadow-[0_2px_10px_rgba(0,0,0,0.05)] rounded-xl flex items-center justify-between text-gray-800 hover:bg-white transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-green-500"
+                    >
+                      {wasteType ? (
+                        <span className="flex items-center gap-3">
+                          <div className={`w-3 h-3 rounded-full ${pointsGuide.find(p => p.category === wasteType)?.color || 'bg-green-500'} shadow-sm`}></div>
+                          <span className="font-medium text-gray-900">{wasteType}</span>
+                        </span>
+                      ) : (
+                        <span className="text-gray-500 font-medium">Select waste type...</span>
+                      )}
+                      <ChevronDown className={`h-5 w-5 text-gray-400 transition-transform duration-300 ${dropdownOpen ? 'rotate-180' : ''}`} />
+                    </button>
+                    {dropdownOpen && (
+                      <>
+                        <div
+                          className="fixed inset-0 z-40"
+                          onClick={() => setDropdownOpen(false)}
+                        ></div>
+                        <div className="absolute top-[calc(100%+8px)] left-0 right-0 bg-white/95 backdrop-blur-xl rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.1)] border border-gray-100/50 overflow-hidden z-50 transform origin-top transition-all duration-200 animate-in fade-in slide-in-from-top-2">
+                          <div className="max-h-60 overflow-y-auto w-full hide-scrollbar">
+                            {pointsGuide.map((item) => (
+                              <button
+                                key={item.category}
+                                type="button"
+                                className={`w-full text-left px-4 py-3 flex items-center justify-between transition-colors border-b border-gray-50 last:border-0 hover:bg-green-50/80 ${wasteType === item.category ? 'bg-green-50/50' : ''}`}
+                                onClick={() => {
+                                  setWasteType(item.category);
+                                  setDropdownOpen(false);
+                                }}
+                              >
+                                <span className="flex items-center gap-3">
+                                  <div className={`w-3 h-3 rounded-full ${item.color} shadow-sm`}></div>
+                                  <span className={`font-medium ${wasteType === item.category ? 'text-green-700' : 'text-gray-800'}`}>{item.category}</span>
+                                </span>
+                                <span className="text-[10px] font-bold text-green-700 bg-green-100 px-2 py-1 rounded-full shadow-sm">{item.points} Pts</span>
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      </>
+                    )}
+                  </div>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="location" className="flex items-center gap-2 text-gray-700 font-semibold ml-1">
