@@ -62,9 +62,9 @@ export default function Footer() {
           <h4 className="text-lg font-semibold text-gray-800 mb-4">Quick Links</h4>
           <ul className="space-y-2 text-gray-600">
             {[
-              { name: "Home", href: "/" },
-              { name: "Scan & Earn", href: "/scan" },
-              { name: "Rewards", href: "/rewards" },
+              { name: "Home", href: "/dashboard/home" },
+              { name: "Scan & Earn", href: "/dashboard/scan" },
+              { name: "Rewards", href: "/dashboard/reward" }, // Note: actual folder is "reward", not plural
               { name: "Dashboard", href: "/dashboard" },
             ].map((item, i) => (
               <li key={i}>

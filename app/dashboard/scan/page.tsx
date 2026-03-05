@@ -523,9 +523,11 @@ export default function UserDashboard() {
                         type="button"
                         onClick={() => startCamera(1)}
                         suppressHydrationWarning
-                        className="group relative w-full h-40 sm:h-48 rounded-xl border-2 border-dashed border-green-400 bg-green-50/50 hover:bg-green-50 transition-all duration-300 flex flex-col items-center justify-center gap-3"
+                        className="group relative w-full h-40 sm:h-48 rounded-xl border-2 border-dashed border-green-400 bg-green-50/50 hover:bg-green-50 transition-all duration-300 overflow-hidden flex flex-col items-center justify-center gap-3"
                       >
-                        <div className="h-12 w-12 bg-white rounded-full flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
+                        {/* Hover Scanning Line Effect */}
+                        <div className="absolute top-0 left-0 w-full h-1 bg-green-400 opacity-0 group-hover:opacity-100 group-hover:animate-[scan_2s_ease-in-out_infinite]" />
+                        <div className="h-12 w-12 bg-white rounded-full flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform relative z-10">
                           <Camera className="h-6 w-6 text-green-600" />
                         </div>
                         <span className="font-medium text-green-800">Scan Waste</span>
@@ -553,9 +555,11 @@ export default function UserDashboard() {
                         type="button"
                         onClick={() => startCamera(2)}
                         suppressHydrationWarning
-                        className="group relative w-full h-40 sm:h-48 rounded-xl border-2 border-dashed border-blue-400 bg-blue-50/50 hover:bg-blue-50 transition-all duration-300 flex flex-col items-center justify-center gap-3"
+                        className="group relative w-full h-40 sm:h-48 rounded-xl border-2 border-dashed border-blue-400 bg-blue-50/50 hover:bg-blue-50 transition-all duration-300 overflow-hidden flex flex-col items-center justify-center gap-3"
                       >
-                        <div className="h-12 w-12 bg-white rounded-full flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
+                        {/* Hover Scanning Line Effect */}
+                        <div className="absolute top-0 left-0 w-full h-1 bg-blue-400 opacity-0 group-hover:opacity-100 group-hover:animate-[scan_2s_ease-in-out_infinite]" />
+                        <div className="h-12 w-12 bg-white rounded-full flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform relative z-10">
                           <Camera className="h-6 w-6 text-blue-600" />
                         </div>
                         <span className="font-medium text-blue-800">Scan Dustbin</span>
