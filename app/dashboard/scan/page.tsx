@@ -87,7 +87,8 @@ export default function UserDashboard() {
   });
 
   // Form state
-  const [imageDataUrl, setImageDataUrl] = useState<string | null>(null);
+  const [wasteImage, setWasteImage] = useState<string | null>(null);
+  const [binImage, setBinImage] = useState<string | null>(null);
   const [wasteType, setWasteType] = useState<string>("");
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [location, setLocation] = useState<string>("");
@@ -95,6 +96,7 @@ export default function UserDashboard() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [cameraActive, setCameraActive] = useState(false);
+  const [activeScanner, setActiveScanner] = useState<1 | 2 | null>(null);
   const [stream, setStream] = useState<MediaStream | null>(null);
 
   useEffect(() => {
@@ -213,7 +215,8 @@ export default function UserDashboard() {
 
   // ==== CAMERA ACCESS & CAPTURE FUNCTIONS ====
 
-  const startCamera = async () => {
+  const startCamera = async (scannerNumber: 1 | 2) => {
+    setActiveScanner(scannerNumber);
     setCameraActive(true);
     try {
       if (
@@ -269,19 +272,20 @@ export default function UserDashboard() {
     const ctx = canvasRef.current.getContext("2d");
     if (ctx && videoRef.current) ctx.drawImage(videoRef.current, 0, 0, width, height);
     const dataUrl = canvasRef.current.toDataURL("image/jpeg");
-    setImageDataUrl(dataUrl);
+    if (activeScanner === 1) {
+      setWasteImage(dataUrl);
+    } else if (activeScanner === 2) {
+      setBinImage(dataUrl);
+    }
     stopCamera();
-  };
-
-  const clearPhoto = () => {
-    setImageDataUrl(null);
+    setActiveScanner(null);
   };
 
   const handleUpload = async () => {
-    if (!imageDataUrl || !wasteType || !location) {
+    if (!wasteImage || !binImage || !wasteType || !location) {
       toast({
         title: "❌ Missing Information",
-        description: "Please fill all fields and capture an image",
+        description: "Please capture both images and fill all fields",
         variant: "destructive",
       });
       return;
@@ -290,17 +294,40 @@ export default function UserDashboard() {
     setUploading(true);
 
     try {
+      // Stitch images vertically
+      const canvas = document.createElement('canvas');
+      const img1 = new window.Image();
+      const img2 = new window.Image();
+
+      await Promise.all([
+        new Promise(resolve => { img1.onload = resolve; img1.src = wasteImage; }),
+        new Promise(resolve => { img2.onload = resolve; img2.src = binImage; })
+      ]);
+
+      canvas.width = Math.max(img1.width, img2.width);
+      canvas.height = img1.height + img2.height;
+
+      const ctx = canvas.getContext("2d");
+      if (ctx) {
+        ctx.fillStyle = 'white';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img1, 0, 0);
+        ctx.drawImage(img2, 0, img1.height);
+      }
+
+      const stitchedDataUrl = canvas.toDataURL("image/jpeg", 0.8);
+
       // Convert dataURL to Blob
       let blob: Blob;
-      if (imageDataUrl.startsWith("data:")) {
-        const binary = typeof window !== "undefined" ? window.atob(imageDataUrl.split(",")[1]) : "";
+      if (stitchedDataUrl.startsWith("data:")) {
+        const binary = typeof window !== "undefined" ? window.atob(stitchedDataUrl.split(",")[1]) : "";
         const array = new Uint8Array(binary.length);
         for (let i = 0; i < binary.length; i++) {
           array[i] = binary.charCodeAt(i);
         }
         blob = new Blob([array], { type: "image/jpeg" });
       } else {
-        const resp = await fetch(imageDataUrl);
+        const resp = await fetch(stitchedDataUrl);
         blob = await resp.blob();
       }
       const file = new File([blob], "waste.jpg", { type: blob.type });
@@ -365,10 +392,11 @@ export default function UserDashboard() {
 
       toast({
         title: "✅ Upload Successful!",
-        description: "Your submission is pending verification.",
+        description: "Your dual submission is pending verification.",
       });
 
-      clearPhoto();
+      setWasteImage(null);
+      setBinImage(null);
       setWasteType("");
       setLocation("");
       fetchSubmissions();
@@ -473,37 +501,88 @@ export default function UserDashboard() {
                   </div>
                 </div>
               </div>
-              <h3 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-green-600 to-teal-600 bg-clip-text text-transparent mb-3">
-                AI Waste Scanner
+              <h3 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-green-600 to-teal-600 bg-clip-text text-transparent mb-2">
+                Two-Step Waste Scanner
               </h3>
-              <p className="text-gray-500 max-w-md mx-auto">
-                Point your camera at any recyclable item. Our AI will identify it and instantly reward you with points.
+              <p className="text-gray-600 font-medium max-w-lg mx-auto mb-1">
+                Step 1: Collection of Waste
+              </p>
+              <p className="text-gray-600 font-medium max-w-lg mx-auto">
+                Step 2: Disposed in Dustbin
               </p>
             </div>
 
             <div className="space-y-6">
-              {!imageDataUrl && !cameraActive && (
-                <div className="max-w-md w-full mx-auto">
-                  <button
-                    type="button"
-                    onClick={startCamera}
-                    suppressHydrationWarning
-                    className="group relative w-full h-48 rounded-2xl border-2 border-dashed border-green-400 bg-green-50/50 hover:bg-green-50 transition-all duration-300 overflow-hidden flex flex-col items-center justify-center gap-4 shadow-inner px-2"
-                  >
-                    {/* Hover Scanning Line Effect */}
-                    <div className="absolute top-0 left-0 w-full h-1 bg-green-400 opacity-0 group-hover:opacity-100 group-hover:animate-[scan_2s_ease-in-out_infinite]" />
-                    <div className="h-16 w-16 bg-white rounded-full flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300 shrink-0">
-                      <Camera className="h-8 w-8 text-green-600" />
-                    </div>
-                    <div className="text-center">
-                      <span className="block text-lg font-bold text-green-800 truncate">Tap to Open Scanner</span>
-                      <span className="text-sm text-green-600/80">Camera access required</span>
-                    </div>
-                  </button>
+              {!cameraActive && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 w-full max-w-3xl mx-auto">
+                  {/* Step 1 Box */}
+                  <div className="bg-white/50 p-4 rounded-2xl shadow-sm border border-white/60 backdrop-blur-sm">
+                    <h4 className="font-bold text-gray-800 mb-3 text-center">1. Collected Waste</h4>
+                    {!wasteImage ? (
+                      <button
+                        type="button"
+                        onClick={() => startCamera(1)}
+                        suppressHydrationWarning
+                        className="group relative w-full h-40 sm:h-48 rounded-xl border-2 border-dashed border-green-400 bg-green-50/50 hover:bg-green-50 transition-all duration-300 flex flex-col items-center justify-center gap-3"
+                      >
+                        <div className="h-12 w-12 bg-white rounded-full flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
+                          <Camera className="h-6 w-6 text-green-600" />
+                        </div>
+                        <span className="font-medium text-green-800">Scan Waste</span>
+                      </button>
+                    ) : (
+                      <div className="relative h-40 sm:h-48 rounded-xl overflow-hidden shadow-md border-2 border-green-400">
+                        <Image src={wasteImage} alt="Waste" fill className="object-cover" unoptimized />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent pointer-events-none" />
+                        <button
+                          className="absolute top-2 right-2 p-1.5 bg-black/50 text-white rounded-full hover:bg-black/70 backdrop-blur-sm transition-colors"
+                          onClick={() => setWasteImage(null)}
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+                        <span className="absolute bottom-2 left-2 bg-green-500 text-white px-2 py-0.5 rounded text-xs font-bold">Captured</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Step 2 Box */}
+                  <div className="bg-white/50 p-4 rounded-2xl shadow-sm border border-white/60 backdrop-blur-sm">
+                    <h4 className="font-bold text-gray-800 mb-3 text-center">2. Disposal in Bin</h4>
+                    {!binImage ? (
+                      <button
+                        type="button"
+                        onClick={() => startCamera(2)}
+                        suppressHydrationWarning
+                        className="group relative w-full h-40 sm:h-48 rounded-xl border-2 border-dashed border-blue-400 bg-blue-50/50 hover:bg-blue-50 transition-all duration-300 flex flex-col items-center justify-center gap-3"
+                      >
+                        <div className="h-12 w-12 bg-white rounded-full flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
+                          <Camera className="h-6 w-6 text-blue-600" />
+                        </div>
+                        <span className="font-medium text-blue-800">Scan Dustbin</span>
+                      </button>
+                    ) : (
+                      <div className="relative h-40 sm:h-48 rounded-xl overflow-hidden shadow-md border-2 border-blue-400">
+                        <Image src={binImage} alt="Dustbin" fill className="object-cover" unoptimized />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent pointer-events-none" />
+                        <button
+                          className="absolute top-2 right-2 p-1.5 bg-black/50 text-white rounded-full hover:bg-black/70 backdrop-blur-sm transition-colors"
+                          onClick={() => setBinImage(null)}
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+                        <span className="absolute bottom-2 left-2 bg-blue-500 text-white px-2 py-0.5 rounded text-xs font-bold">Captured</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
               {cameraActive && (
                 <div className="relative max-w-md mx-auto group">
+                  <div className="text-center mb-4">
+                    <span className="inline-block bg-green-100 text-green-800 font-bold px-4 py-1.5 rounded-full shadow-sm border border-green-200">
+                      {activeScanner === 1 ? "Scanning Collected Waste..." : "Scanning Disposal in Bin..."}
+                    </span>
+                  </div>
                   <div className="rounded-2xl overflow-hidden border-2 border-green-400/50 shadow-2xl relative">
                     {/* Active Laser Overlay */}
                     <div className="absolute inset-0 z-10 pointer-events-none">
@@ -539,31 +618,6 @@ export default function UserDashboard() {
                   </div>
                 </div>
               )}
-              {imageDataUrl && (
-                <div className="relative w-full max-w-md mx-auto">
-                  <div className="relative h-64 sm:h-80 rounded-2xl overflow-hidden border-2 border-green-400 shadow-xl">
-                    <Image
-                      src={imageDataUrl}
-                      alt="Captured preview"
-                      fill
-                      className="object-cover"
-                      unoptimized
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent pointer-events-none" />
-                    <div className="absolute bottom-4 left-4 right-4 text-center z-10">
-                      <span className="bg-green-500/90 text-white px-4 py-1.5 rounded-full text-sm font-semibold shadow-sm backdrop-blur-sm border border-white/20">
-                        Image Captured!
-                      </span>
-                    </div>
-                  </div>
-                  <button
-                    className="absolute top-4 right-4 p-2 bg-black/50 text-white rounded-full hover:bg-black/70 backdrop-blur-md transition-colors border border-white/20"
-                    onClick={clearPhoto}
-                  >
-                    <X className="h-5 w-5" />
-                  </button>
-                </div>
-              )}
               {/* Form Fields */}
               <div className="max-w-md mx-auto space-y-4 sm:space-y-5 bg-white/40 p-4 sm:p-6 rounded-2xl border border-white/60 shadow-sm backdrop-blur-sm mt-6 sm:mt-8">
                 <div className="space-y-2 relative">
@@ -572,6 +626,7 @@ export default function UserDashboard() {
                     <button
                       type="button"
                       onClick={() => setDropdownOpen(!dropdownOpen)}
+                      suppressHydrationWarning
                       className="w-full p-4 bg-white/80 border border-white shadow-[0_2px_10px_rgba(0,0,0,0.05)] rounded-xl flex items-center justify-between text-gray-800 hover:bg-white transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-green-500"
                     >
                       {wasteType ? (
@@ -656,16 +711,16 @@ export default function UserDashboard() {
                   size="lg"
                   className="w-full bg-gradient-eco hover:shadow-xl hover:scale-[1.02] text-white rounded-xl h-14 font-bold text-lg transition-all"
                   onClick={handleUpload}
-                  disabled={uploading || !imageDataUrl || !wasteType || !location}
+                  disabled={uploading || !wasteImage || !binImage || !wasteType || !location}
                   suppressHydrationWarning
                 >
                   {uploading ? (
                     <>
                       <Recycle className="mr-2 h-5 w-5 animate-spin" />
-                      Uploading...
+                      Uploading Dual Image...
                     </>
                   ) : (
-                    "Submit Waste Image"
+                    "Submit Scans for Verification"
                   )}
                 </Button>
               </div>
