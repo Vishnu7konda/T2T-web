@@ -49,6 +49,24 @@ const wasteTypes: string[] = [
   "Mixed Recyclables",
 ];
 
+const pointsGuide = [
+  { category: "Plastic Bottles", points: 15, reason: "Highly recyclable but very common", color: "bg-blue-400" },
+  { category: "Paper Waste", points: 10, reason: "Easy to recycle but low processing cost", color: "bg-yellow-400" },
+  { category: "Metal Cans", points: 25, reason: "High recycling value", color: "bg-gray-400" },
+  { category: "Glass Bottles", points: 20, reason: "Recyclable but requires sorting", color: "bg-teal-400" },
+  { category: "Cardboard", points: 12, reason: "Recyclable but bulky", color: "bg-amber-600" },
+  { category: "E-Waste", points: 50, reason: "High environmental risk & valuable recovery", color: "bg-purple-500" },
+  { category: "Organic Waste", points: 18, reason: "Useful for compost but less recycling value", color: "bg-lime-500" },
+  { category: "Mixed Recyclables", points: 8, reason: "Lower points because sorting required", color: "bg-slate-400" },
+];
+
+const streakBonuses = [
+  { days: "3 Days", bonus: 20, emoji: "🔥" },
+  { days: "7 Days", bonus: 50, emoji: "⚡" },
+  { days: "15 Days", bonus: 120, emoji: "🌟" },
+  { days: "30 Days", bonus: 300, emoji: "👑" },
+];
+
 // ==== Camera Only Section Below ====
 
 export default function UserDashboard() {
@@ -622,6 +640,76 @@ export default function UserDashboard() {
           </div>
         </CardContent>
       </Card>
+      {/* Points & Bonuses Guide */}
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+        <Card className="xl:col-span-2 border-0 shadow-md bg-white overflow-hidden">
+          <CardHeader className="bg-gradient-to-r from-green-50 to-emerald-50 border-b border-green-100 pb-4">
+            <CardTitle className="flex items-center gap-2 text-xl text-green-800">
+              <Recycle className="h-6 w-6 text-green-600" />
+              Waste Categories & Points
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-0">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm text-left">
+                <thead className="text-xs text-green-800 uppercase bg-green-50/50">
+                  <tr>
+                    <th className="px-6 py-4 font-bold">Waste Category</th>
+                    <th className="px-6 py-4 font-bold text-center">Points</th>
+                    <th className="px-6 py-4 font-bold hidden sm:table-cell">Reason</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {pointsGuide.map((item, idx) => (
+                    <tr key={idx} className="hover:bg-green-50/30 transition-colors">
+                      <td className="px-6 py-4 font-medium text-gray-900 flex items-center gap-3">
+                        <div className={`w-3 h-3 rounded-full ${item.color} shadow-sm shrink-0`}></div>
+                        {item.category}
+                      </td>
+                      <td className="px-6 py-4 text-center">
+                        <span className="inline-flex items-center justify-center px-3 py-1 rounded-full bg-green-100 text-green-700 font-bold text-xs shrink-0 whitespace-nowrap shadow-sm">
+                          {item.points} Pts
+                        </span>
+                      </td>
+                      <td className="px-6 py-3 text-gray-500 hidden sm:table-cell text-xs leading-relaxed max-w-xs">
+                        {item.reason}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-0 shadow-md bg-white overflow-hidden flex flex-col">
+          <CardHeader className="bg-gradient-to-r from-orange-50 to-red-50 border-b border-orange-100 pb-4">
+            <CardTitle className="flex items-center gap-2 text-xl text-orange-800">
+              <Flame className="h-6 w-6 text-orange-600" />
+              Streak Bonuses
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-0 flex-1 flex flex-col">
+            <div className="p-4 sm:p-5 text-sm text-gray-600 bg-orange-50/30 border-b border-orange-50 font-medium">
+              Maintain a daily scanning streak and earn massive bonuses on top of your regular points!
+            </div>
+            <ul className="divide-y divide-gray-100 flex-1 flex flex-col">
+              {streakBonuses.map((streak, idx) => (
+                <li key={idx} className="flex items-center justify-between p-4 sm:p-5 hover:bg-orange-50/30 transition-colors flex-1">
+                  <div className="flex items-center gap-3">
+                    <span className="text-2xl filter drop-shadow-sm">{streak.emoji}</span>
+                    <span className="font-bold text-gray-800 text-base">{streak.days}</span>
+                  </div>
+                  <span className="inline-flex items-center justify-center px-4 py-1.5 rounded-full bg-gradient-to-r from-orange-100 to-red-100 text-orange-700 font-bold shadow-sm whitespace-nowrap">
+                    +{streak.bonus} Pts
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </CardContent>
+        </Card>
+      </div>
+
       {/* Badges */}
       <Card>
         <CardHeader>
