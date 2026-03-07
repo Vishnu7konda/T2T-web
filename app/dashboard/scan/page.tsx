@@ -61,8 +61,8 @@ const pointsGuide = [
 ];
 
 const streakBonuses = [
-  { days: "3 Days", bonus: 20, emoji: "🔥" },
-  { days: "7 Days", bonus: 50, emoji: "⚡" },
+  { days: "5 Days", bonus: 20, emoji: "🔥" },
+  { days: "10 Days", bonus: 50, emoji: "⚡" },
   { days: "15 Days", bonus: 120, emoji: "🌟" },
   { days: "30 Days", bonus: 300, emoji: "👑" },
 ];
