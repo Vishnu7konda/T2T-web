@@ -3,7 +3,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import confetti from "canvas-confetti";
-import { Gift, Star, History, CheckCircle2 } from "lucide-react";
+import { Gift, Star, History, CheckCircle2, ChevronDown } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
@@ -120,6 +120,7 @@ export default function RewardPage() {
   const [redemptionCode, setRedemptionCode] = useState<string>("");
   const [isRedeemDialogOpen, setIsRedeemDialogOpen] = useState(false);
   const [isCelebrating, setIsCelebrating] = useState(false);
+  const [sortBy, setSortBy] = useState<string>("credits_asc");
 
   const [history, setHistory] = useState<any[]>([
     { id: 101, name: "Eco Bamboo Bottle", date: "2026-02-28", code: "ECOB-44D1-9F08" },
@@ -168,6 +169,16 @@ export default function RewardPage() {
       }, ...prev]);
     }, 2800);
   };
+
+  const sortedRewards = [...rewards].sort((a, b) => {
+    switch (sortBy) {
+      case "credits_asc": return a.points - b.points;
+      case "credits_desc": return b.points - a.points;
+      case "name_asc": return a.name.localeCompare(b.name);
+      case "name_desc": return b.name.localeCompare(a.name);
+      default: return 0;
+    }
+  });
 
   return (
     <section className="w-full relative z-10 p-2">
@@ -227,11 +238,22 @@ export default function RewardPage() {
           <h2 className="font-extrabold text-2xl md:text-3xl bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent mb-1">
             Available Premium Rewards
           </h2>
-          <div className="flex items-center text-sm text-gray-500 gap-2 font-medium">
-            <span>Sort by:</span>
-            <span className="flex items-center font-bold text-gray-700 bg-gray-100 px-3 py-1 rounded-full cursor-pointer hover:bg-gray-200 transition">
-              Credits (Low <span className="mx-1">→</span> High)
-            </span>
+          <div className="flex items-center text-sm text-gray-500 gap-2 font-medium relative z-20">
+            <label htmlFor="sort-rewards">Sort by:</label>
+            <div className="relative">
+              <select
+                id="sort-rewards"
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="appearance-none font-bold text-gray-700 bg-gray-100 pl-4 pr-10 py-1.5 rounded-full cursor-pointer hover:bg-gray-200 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500/50 border border-transparent hover:border-gray-300"
+              >
+                <option value="credits_asc">Credits (Low → High)</option>
+                <option value="credits_desc">Credits (High → Low)</option>
+                <option value="name_asc">Name (A → Z)</option>
+                <option value="name_desc">Name (Z → A)</option>
+              </select>
+              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500 pointer-events-none" />
+            </div>
           </div>
         </div>
         <Button
@@ -245,7 +267,7 @@ export default function RewardPage() {
       </div>
       {/* Rewards Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-        {rewards.map((reward, i) => (
+        {sortedRewards.map((reward, i) => (
           <motion.div
             key={reward.id}
             initial={{ opacity: 0, y: 30 }}
