@@ -121,6 +121,14 @@ export default function RewardPage() {
   const [isRedeemDialogOpen, setIsRedeemDialogOpen] = useState(false);
   const [isCelebrating, setIsCelebrating] = useState(false);
   const [sortBy, setSortBy] = useState<string>("credits_asc");
+  const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false);
+
+  const sortOptions = [
+    { value: "credits_asc", label: "Credits (Low → High)", icon: "📈" },
+    { value: "credits_desc", label: "Credits (High → Low)", icon: "📉" },
+    { value: "name_asc", label: "Name (A → Z)", icon: "🔤" },
+    { value: "name_desc", label: "Name (Z → A)", icon: "🔡" }
+  ];
 
   const [history, setHistory] = useState<any[]>([
     { id: 101, name: "Eco Bamboo Bottle", date: "2026-02-28", code: "ECOB-44D1-9F08" },
@@ -239,20 +247,45 @@ export default function RewardPage() {
             Available Premium Rewards
           </h2>
           <div className="flex items-center text-sm text-gray-500 gap-2 font-medium relative z-20">
-            <label htmlFor="sort-rewards">Sort by:</label>
+            <span className="hidden sm:inline-block">Sort by:</span>
             <div className="relative">
-              <select
-                id="sort-rewards"
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                className="appearance-none font-bold text-gray-700 bg-gray-100 pl-4 pr-10 py-1.5 rounded-full cursor-pointer hover:bg-gray-200 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500/50 border border-transparent hover:border-gray-300"
+              <button
+                type="button"
+                onClick={() => setIsSortDropdownOpen(!isSortDropdownOpen)}
+                suppressHydrationWarning
+                className="flex items-center gap-2 font-bold text-gray-700 bg-white border border-gray-200 shadow-sm pl-4 pr-3 py-2 rounded-full cursor-pointer hover:bg-gray-50 hover:border-emerald-300 transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
               >
-                <option value="credits_asc">Credits (Low → High)</option>
-                <option value="credits_desc">Credits (High → Low)</option>
-                <option value="name_asc">Name (A → Z)</option>
-                <option value="name_desc">Name (Z → A)</option>
-              </select>
-              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500 pointer-events-none" />
+                <span className="mr-1">{sortOptions.find(opt => opt.value === sortBy)?.icon}</span>
+                {sortOptions.find(opt => opt.value === sortBy)?.label}
+                <ChevronDown className={`h-4 w-4 text-emerald-600 transition-transform duration-300 ml-1 ${isSortDropdownOpen ? 'rotate-180' : ''}`} />
+              </button>
+
+              {isSortDropdownOpen && (
+                <>
+                  <div
+                    className="fixed inset-0 z-40"
+                    onClick={() => setIsSortDropdownOpen(false)}
+                  ></div>
+                  <div className="absolute top-[calc(100%+8px)] right-0 min-w-[200px] bg-white/95 backdrop-blur-xl rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.1)] border border-gray-100/50 overflow-hidden z-50 transform origin-top transition-all duration-200 animate-in fade-in zoom-in-95">
+                    <div className="p-1">
+                      {sortOptions.map((opt) => (
+                        <button
+                          key={opt.value}
+                          type="button"
+                          className={`w-full text-left px-3 py-2.5 rounded-lg flex items-center gap-2 transition-colors ${sortBy === opt.value ? 'bg-emerald-50 text-emerald-700 font-bold' : 'text-gray-700 hover:bg-gray-50'}`}
+                          onClick={() => {
+                            setSortBy(opt.value);
+                            setIsSortDropdownOpen(false);
+                          }}
+                        >
+                          <span className="text-base">{opt.icon}</span>
+                          <span className="text-sm">{opt.label}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </div>
