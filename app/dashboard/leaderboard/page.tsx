@@ -61,8 +61,8 @@ export default function LeaderboardPage() {
       if (!response.ok) {
         console.warn('Backend API unavailable (likely missing DB config). Displaying empty leaderboard.');
         const mockLeaderboard = [
-          { rank: 1, id: "u-1", name: "anandhi nallaganti", email: "rajesh@example.com", points: 8500, level: "PLATINUM", submissions: 154, avatar: "https://i.pravatar.cc/150?u=rajesh", joinedAt: new Date().toISOString() },
-          { rank: 2, id: "u-2", name: "manideep kandhu", email: "priya@example.com", points: 6200, level: "GOLD", submissions: 112, avatar: "https://i.pravatar.cc/150?u=priya", joinedAt: new Date().toISOString() },
+          { rank: 1, id: "u-1", name: "anandhi nallaganti", email: "anandhinallagant@example.com", points: 8500, level: "PLATINUM", submissions: 154, avatar: "https://i.pravatar.cc/150?u=rajesh", joinedAt: new Date().toISOString() },
+          { rank: 2, id: "u-2", name: "manideep kandhu", email: "manideepkandhu@example.com", points: 6200, level: "GOLD", submissions: 112, avatar: "https://i.pravatar.cc/150?u=priya", joinedAt: new Date().toISOString() },
           { rank: 3, id: "u-3", name: "Abhiram Lokati", email: "amit@example.com", points: 4800, level: "SILVER", submissions: 89, avatar: "https://i.pravatar.cc/150?u=amit", joinedAt: new Date().toISOString() },
           { rank: 4, id: "u-4", name: "Suresh Raina", email: "neha@example.com", points: 3900, level: "BRONZE", submissions: 65, avatar: "https://i.pravatar.cc/150?u=neha", joinedAt: new Date().toISOString() },
           { rank: 5, id: "u-5", name: "Nehal wadhera", email: "suresh@example.com", points: 2100, level: "BRONZE", submissions: 32, avatar: "https://i.pravatar.cc/150?u=suresh", joinedAt: new Date().toISOString() },
